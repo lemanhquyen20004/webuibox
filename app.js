@@ -163,6 +163,17 @@
   async function connect() {
     if (demo) { stopWs();resetDemo();return; }
     stopWs();
+    // Never leave illustrative demo metrics visible after switching to live mode.
+    proxies={};providers={};connections=[];rules=[];logs=[];config={};
+    seriesDown=Array(60).fill(0);seriesUp=Array(60).fill(0);
+    $("#download-speed").textContent="—";$("#upload-speed").textContent="—";
+    $("#total-down").textContent="—";$("#total-up").textContent="—";
+    $("#memory").textContent="—";$("#memory-progress").style.width="0%";
+    $("#uptime").textContent="—";$("#connection-count").textContent="—";
+    $("#core-version").textContent="—";$("#connection-mode").textContent="Mihomo API";
+    renderAll();
+    // Read current Box binary even when the Mihomo API is offline.
+    await loadBridge();
     try {
       const v=await request("/version");
       live=true;startedAt=Date.now();
@@ -386,6 +397,7 @@
     if(demo)resetDemo();else await connect();
     setInterval(()=>{if(demo)demoSpeed();else if(live)$("#uptime").textContent=prettyTime((Date.now()-startedAt)/1000);},1000);
     setInterval(()=>{if(live&&!demo)refreshAll();},6500);
+    setInterval(()=>{if(!demo)loadBridge();},12000);
     setInterval(()=>checkUpdates(false),6*60*60*1000);
     setTimeout(()=>checkUpdates(false),1700);
   }
