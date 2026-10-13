@@ -1,57 +1,58 @@
-# WebUiBox v0.0.1
+# WebUiBox v0.0.2
 
-**Dark Neon WebUI for Mihomo / Clash Meta**, with a root-only status bridge for Box for Root (Box for Magisk). Responsive mobile and desktop layouts with **Vietnamese / English**.
+**Dark Neon Box for Root dashboard** for Mihomo/Clash Meta on Android root. UI rebuilt for the approved desktop/mobile reference, with Vietnamese/English switching.
 
 [Hướng dẫn tiếng Việt](README_vi.md)
 
-## Implemented features
+## What works
 
-- Live upload/download from Mihomo WebSocket, totals and active connections.
-- Proxy groups, switch node, measure delay, refresh proxy providers.
-- List/terminate active sessions, inspect routing rules, view live logs.
-- Rule / Global / Direct mode, reload Mihomo configuration, clear DNS and Fake-IP cache.
-- Show actual **bin_name** from /data/adb/box/settings.ini using a safe local JSON status file (does not execute settings.ini).
-- Check update.json at startup and every six hours; show a banner when a newer version is available.
-- Explicit upgrade script that verifies SHA-256, asks permission and creates a backup.
-- Clearly labeled DEMO preview, with no API write actions permitted while DEMO is on.
+- Live upload/download speeds, totals, selected proxy and connection counts from Mihomo REST and WebSocket APIs.
+- Proxy groups and node switching, latency tests, proxy-provider updates, active connections and disconnect, routing rules, logs, Rule/Global/Direct mode, config reload, DNS and Fake-IP cache flushing.
+- Optional Android root bridge shows the **literal bin_name** in /data/adb/box/settings.ini and reads actual phone CPU and RAM usage from /proc/stat and /proc/meminfo.
+- Donut chart uses bytes of **currently active connections** (when Mihomo supplies them), not fictitious daily per-proxy totals.
+- Checks GitHub update.json periodically; newer versions show a notification. Root update script verifies downloaded release ZIP against its SHA-256 file before replacing files.
+- Theme, desktop navigation, mobile bottom tabs, responsive cards, bilingual UI. DEMO is optional and labeled; real measurements are never fabricated.
 
-This is an **independent, new frontend** implementing the Mihomo features above, not a copy of the full Zashboard distribution. Advanced Zashboard features (3D globe, topology, deep rules editing) and Hotspot management are not yet implemented.
+**Important limitations:** Mihomo REST/WebSocket controls are usable only while Mihomo is the active server. If Box is switched to Xray, sing-box, V2Fly or Hysteria, the local Mihomo-hosted /ui/ server may not be available. No root HTTP server or cross-core control API is included. Device CPU and RAM require the root bridge to be running. Phone system RAM and Mihomo process RAM are different metrics. The decorative reference screenshot is not a performance benchmark.
 
-## Install on Android with Box for Root
+## Installation (Box for Root / Redmi Note 8T)
 
-1. Download/extract this repository (or a release ZIP once available).
-2. Run **scripts/install.sh** as root from its extracted folder. For example using a root shell with the correct extracted path: su -c sh /path/to/webuibox/scripts/install.sh
-3. This installs files under /data/adb/box/webuibox without editing your Box settings or firewall. It backs up any earlier WebUiBox installation to /data/adb/box/webuibox.backup.
-4. Add or modify the following entries in your currently selected **Mihomo YAML** (do not introduce duplicate keys):
+**This ZIP is NOT a flashable Magisk module.**
+
+1. Back up /data/adb/box/clash/config.yaml and existing UI folder. Download webuibox-v0.0.2.zip from the release, extract its contents.
+2. Use MT Manager root access to copy the files under **/data/adb/box/clash/webuibox/**. index.html, app.js, styles.css and update.json must be directly inside that folder; bridge/box-status.sh goes inside its bridge/ subfolder.
+3. While Box/Mihomo is stopped, edit the existing /data/adb/box/clash/config.yaml and set, **without duplicate keys**:
 
         external-controller: 127.0.0.1:9090
-        secret: "SET_A_STRONG_PRIVATE_SECRET"
-        external-ui: /data/adb/box/webuibox
+        secret: "YOUR_PRIVATE_API_SECRET"
+        external-ui: /data/adb/box/clash/webuibox
 
-5. Restart Mihomo from Box. Visit http://127.0.0.1:9090/ui/ in your phone browser, open Settings, enter the local API endpoint and secret, and turn DEMO off.
-6. For immediate core detection, run /system/bin/sh /data/adb/box/webuibox/bridge/box-status.sh --once; on next reboot Magisk service.d runs the background writer every 10 seconds.
+   Keep your existing external-controller port and secret if already configured. **Do not** set external-ui outside the Mihomo safe path. Avoid old global-client-fingerprint in recent Mihomo.
+4. Optional root-script installation: from the extracted release folder run /system/bin/sh scripts/install.sh as root. This creates an on-boot bridge service and a backup at /data/adb/box/clash/webuibox.backup. It **does not edit settings.ini, proxies, iptables or the YAML itself**.
+5. If installing manually with MT Manager only, create /data/adb/service.d/webuibox-status.sh with these contents and set permission 0755:
 
-If your external-ui-name is customized, adjust the /ui/ URL. If you switch Box bin_name to sing-box/Xray, the selected binary name still displays, but the Mihomo API features require a running Mihomo-compatible controller.
+        #!/system/bin/sh
+        /system/bin/sh /data/adb/box/clash/webuibox/bridge/box-status.sh >/dev/null 2>&1 &
+
+   Run box-status.sh --once as root, or reboot to enable the bridge.
+6. Restart Mihomo using your existing Box workflow. Browse **http://127.0.0.1:9090/ui/** in a private tab to clear the old Zashboard cache. In Settings, set the Mihomo API URL and secret and disable DEMO.
+
+The status file is stored under /data/adb/box/clash/webuibox/box-status.json. The bridge emits only core name, process presence, CPU/RAM and uptime. No credentials are read from Box settings.
 
 ## Updates
 
-The **update.json** manifest on main declares the published version. Bump version in **update.json**, **package.json**, **app.js**, and **index.html** when releasing; create a matching Git tag **vX.Y.Z**. GitHub Actions builds **webuibox-vX.Y.Z.zip** and its SHA-256 checksum and publishes them as release assets.
+Releases are packaged by GitHub Actions when package.json/update.json contain the matching new version. Browser update notifications do not execute root commands. For a deliberate root-side upgrade, run:
 
-The browser checks for updates but **does not execute root commands**. Once a new release exists, the optional authenticated root-side upgrade is:
+        su -c sh /data/adb/box/clash/webuibox/scripts/update.sh
 
-        su -c sh /data/adb/box/webuibox/scripts/update.sh
+This needs HTTPS curl/wget and unzip, asks permission, verifies SHA-256, then invokes the installer and backs up the previous WebUI. If you are on v0.0.1 at /data/adb/box/webuibox, install v0.0.2 manually or with the new install script first, since the updater now uses Mihomo's safe-path location.
 
-It prompts for approval, verifies the ZIP checksum and backs up the existing WebUI. Installing from GitHub Releases requires a real published release ZIP (an update.json change alone is not enough).
+Do not use Box's **box.tool upxui** after switching WebUI if you want to keep it: that command downloads Zashboard into the default **clash/dashboard** directory. WebUiBox uses its own directory instead.
 
 ## Security and compatibility
 
-- Keep **external-controller bound to 127.0.0.1** and protect it with a strong secret. Do not expose the API or status files publicly.
-- API secret is saved in browser **sessionStorage** (not committed to GitHub).
-- Same-origin hosting via Mihomo external-ui is recommended; separate websites may be blocked by CORS/mixed content.
-- The Box reader does **not source or execute settings.ini**, nor add iptables rules, VPN hooks, or any root HTTP listeners.
-- CPU percentage is intentionally not invented: the standard Mihomo endpoints used here do not provide device CPU. RAM shows Mihomo process memory when available.
-- Android/Magisk compatibility requires on-device verification; back up working configs first.
+Bind Mihomo external-controller only to 127.0.0.1 and use a strong secret. Never forward it publicly. Browser stores secret only in sessionStorage. The root bridge has no HTTP listener and does not evaluate settings.ini. No changes are made to Box proxy/tethering firewall logic. Review configuration before changing it on a live device.
 
-Inspired by the visual direction requested after reviewing the separate [Zashboard](https://github.com/Zephyruso/zashboard) project, but not a redistribution of its code.
+The dashboard is an independent implementation; [Zashboard](https://github.com/Zephyruso/zashboard) is a separate project used as a UI reference.
 
-© 2026 lemanhquyen20004 · MIT License.
+© 2026 lemanhquyen20004 · MIT.

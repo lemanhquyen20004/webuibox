@@ -1,9 +1,9 @@
 {
   "name": "WebUiBox",
-  "version": "0.0.1",
-  "release_url": "https://github.com/lemanhquyen20004/webuibox/releases",
+  "version": "0.0.2",
+  "release_url": "https://github.com/lemanhquyen20004/webuibox/releases/tag/v0.0.2",
   "notes": {
-    "vi": "Giao diện Dark Neon, Mihomo API, bridge Box bin_name và kiểm tra cập nhật.",
-    "en": "Initial Dark Neon UI, Mihomo API, Box core detector and update checker."
+    "vi": "Thiết kế lại Dark Neon desktop/mobile theo ảnh đã duyệt, biểu đồ tròn theo kết nối, icon SVG, đo CPU/RAM thật và sửa bridge bin_name vào đường dẫn Mihomo.",
+    "en": "Redesigned desktop/mobile Dark Neon UI, live active-traffic donut, SVG icons, real Android CPU/RAM and fixed bin_name bridge path."
   }
 }
