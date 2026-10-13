@@ -210,3 +210,26 @@ button:active{transform:scale(.98)}
  .page-heading .primary-button{white-space:normal;font-size:10px;padding:7px}
  .sidebar-nav button:hover{transform:none}
 }
+
+/* Vector icons and subtle glass highlights */
+.brand-logo{background:none;filter:drop-shadow(0 0 9px #2369ff);padding:0;width:43px;height:44px;display:grid;place-items:center}
+.brand-logo svg{width:42px;height:42px;overflow:visible}
+.cube{background:none;filter:drop-shadow(0 0 8px #3d68ff);display:inline-flex;align-items:center}
+.cube svg{height:30px;width:30px}
+.sidebar .version-card .cube svg{height:29px;width:29px}
+.mobile-brand .cube svg{width:34px;height:34px}
+.nav-icon svg,.mobile-nav svg,.notification-bell svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.sidebar-nav .nav-icon svg{width:22px;height:22px;filter:drop-shadow(0 0 6px #5a75ff38)}
+.mobile-nav b{display:flex;align-items:center;justify-content:center}
+.mobile-nav svg{width:22px;height:22px}
+.notification-bell svg{width:19px;height:19px}
+.update-emblem{filter:drop-shadow(0 0 14px #8060ff)}
+.update-emblem svg{height:68px;width:68px}
+.stat .stat-big,.core-detail strong,.big-number,.latency-big{text-shadow:0 2px 15px #0007}
+.panel:hover,.stat:hover{border-color:#315d86}
+.panel,.stat{transition:border-color .18s ease}
+@media (max-width:640px){
+ .mobile-brand .cube{grid-row:1/3}
+ .mobile-brand .cube svg{height:34px;width:34px}
+ .mobile-nav b svg{width:22px;height:22px}
+}
