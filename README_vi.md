@@ -1,53 +1,64 @@
-# WebUiBox v0.0.1 — Dark Neon
+# WebUiBox v0.0.2 — Giao diện Dark Neon
 
-Giao diện WebUI quản lý **Mihomo/Clash Meta** trong **Box for Magisk/Box for Root**, có 2 ngôn ngữ **Tiếng Việt / English**, chạy được trên điện thoại và máy tính.
+Đây là WebUI dành cho **Box for Magisk / Box for Root khi chạy Mihomo (Clash Meta)**. Bản v0.0.2 thiết kế lại theo ảnh demo desktop + điện thoại đã duyệt. Hỗ trợ **Tiếng Việt và English**.
 
-[English README](README.md)
+[English](README.md)
 
-## Chức năng đã có
+## Chức năng giữ nguyên và mở rộng
 
-- Biểu đồ tốc độ Download/Upload trực tiếp, tổng lưu lượng, số kết nối và bộ nhớ core.
-- Danh sách nhóm proxy, đổi node, kiểm tra ping HTTP, cập nhật proxy provider.
-- Xem và ngắt các phiên kết nối, xem quy tắc và nhật ký thời gian thực.
-- Chỉnh chế độ Rule / Global / Direct; reload config; xóa DNS cache / Fake-IP.
-- **Hiển thị đúng bin_name trong /data/adb/box/settings.ini** thông qua script root xuất JSON, không đọc được root trực tiếp từ trình duyệt.
-- Phiên bản ban đầu **v0.0.1**, kiểm tra cập nhật GitHub lúc vào WebUI và sau mỗi 6 giờ; có phiên bản mới sẽ hiện thông báo.
-- Script nâng cấp có xác nhận, so SHA-256 và sao lưu bản cũ.
-- Chế độ DEMO có nhãn riêng, không gửi lệnh vào core.
+- Tốc độ tải xuống/tải lên theo thời gian thực, tổng lưu lượng, danh sách kết nối, proxy đang chọn.
+- Các nhóm Proxy, chọn node, đo ping qua API, cập nhật provider, ngắt kết nối, Rules, Logs.
+- Rule/Global/Direct, nạp lại cấu hình, xóa DNS/Fake-IP cache.
+- Hiển thị **đúng bin_name của Box** từ /data/adb/box/settings.ini bằng bridge root.
+- Thêm CPU và RAM **thực tế của điện thoại** qua /proc; RAM Mihomo vẫn được hiển thị riêng.
+- Biểu đồ tròn dùng lưu lượng của **kết nối hiện tại** do Mihomo cung cấp, không giả mạo số liệu tổng mỗi ngày.
+- Kiểm tra cập nhật GitHub, cảnh báo bản mới, script xác minh SHA-256 và sao lưu khi cài phiên bản mới.
+- Layout desktop và mobile riêng, Dark Neon Cyan/Tím, gọn, có VI/EN.
+- Dữ liệu DEMO chỉ là minh họa khi bật thủ công.
 
-Đây là bản WebUiBox mới được viết độc lập để quản lý các chức năng Mihomo phía trên. **Chưa có đầy đủ những tính năng nâng cao của Zashboard** như bản đồ 3D, topology và chỉnh rule chuyên sâu. Chưa có quản lý Hotspot.
+**Giới hạn:** Đây vẫn là giao diện **Mihomo**. Nếu đổi bin_name sang sing-box, Xray, V2Fly hay Hysteria, Mihomo có thể ngừng phục vụ trang /ui/ và các chức năng riêng của Mihomo không hoạt động. WebUiBox chưa có backend quản lý riêng các core này, chưa điều khiển hotspot. CPU/RAM toàn máy cần script bridge.
 
-## Cài vào Box for Magisk
+## Cài bằng MT Manager trên Android root
 
-1. Tải và giải nén mã nguồn/release ZIP.
-2. Chạy scripts/install.sh bằng quyền root (có thể dùng môi trường shell hỗ trợ su). Script cài vào /data/adb/box/webuibox và tạo backup tại /data/adb/box/webuibox.backup, không sửa iptables hoặc config Box.
-3. Trong file YAML đang chạy bằng Mihomo, thêm/chỉnh **một lần** những mục sau:
+**Không flash file ZIP này bằng Magisk.** Đây là gói WebUI.
+
+1. Sao lưu file /data/adb/box/clash/config.yaml và thư mục WebUI cũ.
+2. Tải **webuibox-v0.0.2.zip** tại mục Releases, mở trong MT Manager và giải nén.
+3. Copy file trực tiếp vào **/data/adb/box/clash/webuibox/**:
+
+        /data/adb/box/clash/webuibox/
+        ├── index.html
+        ├── app.js
+        ├── styles.css
+        ├── update.json
+        ├── bridge/box-status.sh
+        └── scripts/install.sh, update.sh
+
+4. Dừng Mihomo trước khi sửa file /data/adb/box/clash/config.yaml. Giữ cổng và Secret hiện tại nếu đã có, đảm bảo mỗi khóa chỉ khai báo một lần:
 
         external-controller: 127.0.0.1:9090
-        secret: "MAT_KHAU_API_MANH"
-        external-ui: /data/adb/box/webuibox
+        secret: "MAT_KHAU_RIENG_CUA_BAN"
+        external-ui: /data/adb/box/clash/webuibox
 
-4. Khởi động lại Mihomo. Mở http://127.0.0.1:9090/ui/ trong Chrome. Vào Cài đặt, nhập URL API và secret, tắt DEMO để dữ liệu thực xuất hiện.
-5. Để hiển thị bin_name ngay, chạy /system/bin/sh /data/adb/box/webuibox/bridge/box-status.sh --once. Khi khởi động máy lần sau, script Magisk service.d tự cập nhật trạng thái 10 giây một lần.
+   Chú ý: Mihomo SAFE_PATHS không cho phép dùng external-ui: /data/adb/box/webuibox ở ngoài clash. Nếu bản Mihomo mới báo lỗi **global-client-fingerprint** đã bị loại bỏ, cần bỏ mục toàn cục đó; tùy node đặt client-fingerprint riêng.
+5. Để script đọc bin_name và CPU/RAM tự chạy khi khởi động: bằng MT Manager root tạo file /data/adb/service.d/webuibox-status.sh, đặt quyền 0755, nội dung:
 
-Nếu Box chọn bin_name là **clash** nhưng lõi thực tế là Mihomo, giao diện sẽ hiển thị **clash**, đúng theo settings.ini. Khi đổi sang sing-box/Xray thì phần API của Mihomo sẽ không hoạt động cho đến khi có adapter tương ứng.
+        #!/system/bin/sh
+        /system/bin/sh /data/adb/box/clash/webuibox/bridge/box-status.sh >/dev/null 2>&1 &
 
-## Cơ chế cập nhật
+   Khởi động lại điện thoại hoặc chạy bridge/box-status.sh --once qua môi trường root để sinh file box-status.json. Script cập nhật file trạng thái mỗi khoảng 10 giây.
+6. Bật lại Box/Mihomo. Mở **http://127.0.0.1:9090/ui/** trong tab ẩn danh của Chrome. Chọn Cài đặt, nhập API URL cùng Secret, tắt DEMO nếu đang bật. Có thể cần xóa cache Zashboard cũ.
 
-Giao diện lấy phiên bản trong update.json của repo GitHub. Khi lớn hơn bản đang dùng sẽ báo cập nhật và dẫn tới GitHub Releases. **Trình duyệt không được thực thi lệnh root**, để tránh rủi ro bị website điều khiển thiết bị.
+**Nếu muốn chạy trình cài thay vì chép thủ công**, chạy scripts/install.sh bằng quyền root từ thư mục đã giải nén. Trình cài không thay YAML, firewall hay nodes; chỉ cài WebUI, backup và tạo script trạng thái.
 
-Khi đã có bản phát hành mới, chạy với quyền root:
+## Cập nhật
 
-        su -c sh /data/adb/box/webuibox/scripts/update.sh
+Khi GitHub update.json có version mới, trang Cập nhật sẽ hiện thông báo. **Trang web không được phép tự chạy lệnh root.** Khi có Release mới, có thể dùng lệnh root sau:
 
-Script hỏi xác nhận, tải ZIP và checksum, xác minh SHA-256 trước khi thay file, giữ bản cũ trong thư mục backup. Muốn tạo Release mới cần tăng version trong update.json, package.json, app.js, index.html, sau đó tạo tag vX.Y.Z để workflow GitHub đóng gói và phát hành.
+        su -c sh /data/adb/box/clash/webuibox/scripts/update.sh
 
-## Bảo mật / lưu ý
+Script hỏi trước, tải Release ZIP và SHA-256, so khớp rồi thay UI và sao lưu bản cũ. Bản v0.0.1 cũ ở thư mục /data/adb/box/webuibox cần chuyển/cài v0.0.2 một lần để dùng đường dẫn cập nhật mới.
 
-- Chỉ mở external-controller ở **127.0.0.1**, đặt secret mạnh, không phơi API ra Internet.
-- Secret chỉ lưu trong session trình duyệt.
-- Trình duyệt không thể tự đọc thư mục root Android. Bridge chỉ trích bin_name, không thực thi settings.ini.
-- Để tránh CORS, nên dùng WebUiBox từ đường dẫn /ui/ do Mihomo phục vụ.
-- Chưa kiểm thử thực tế trên mọi bản Magisk/MIUI, hãy sao lưu cấu hình trước khi dùng.
+**Không chạy lệnh box.tool upxui** sau khi đổi giao diện nếu muốn giữ WebUiBox, vì Box tải Zashboard vào /data/adb/box/clash/dashboard. Để tránh bị ghi đè, WebUiBox được tách riêng thành clash/webuibox.
 
-© 2026 lemanhquyen20004 · MIT. Tham khảo dự án Zashboard riêng biệt: https://github.com/Zephyruso/zashboard
+© 2026 lemanhquyen20004 · MIT.

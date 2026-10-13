@@ -1,8 +1,8 @@
-/* WebUiBox v0.0.1 — independently implemented UI using the Mihomo REST/WebSocket API.
+/* WebUiBox v0.0.2 — independently implemented UI using the Mihomo REST/WebSocket API.
    Demo data is clearly labeled; live mode never invents traffic or CPU metrics. */
 (function () {
   "use strict";
-  const VERSION = "0.0.1";
+  const VERSION = "0.0.2";
   const REPO = "https://github.com/lemanhquyen20004/webuibox";
   const MANIFEST = "https://raw.githubusercontent.com/lemanhquyen20004/webuibox/main/update.json";
   const $ = (selector) => document.querySelector(selector);
@@ -25,8 +25,15 @@
       running:"Running",offline:"Disconnected",unknown:"Unknown",notAvailable:"Not available",preview:"Preview mode",test:"Test",choose:"Select node",empty:"No data",providerUpdated:"Provider updated",success:"Success",confirmDisconnect:"Close all active connections?",failed:"Error",updateAvailable:"New version available",latest:"You have the latest version",cannotCheck:"Unable to check for updates",demoReadOnly:"Demo mode: no commands are sent to Mihomo.",connected:"API connected successfully",needApi:"Configure Mihomo API first.",apiProblem:"Cannot connect to Mihomo API",noBridge:"Could not read Box bin_name. Install the status bridge.",bridgeReady:"Box bin_name detected",noActive:"No proxy groups found"
     }
   };
+
+  Object.assign(tr.vi, {
+    tools:"Công cụ",about:"Giới thiệu",today:"Hôm nay",device:"Thiết bị",cpuFoot:"CPU toàn máy · cần bridge root",boxStatus:"Trạng thái Box",latency:"Độ trễ",latencyFoot:"Độ trễ node đã chọn",current:"Hiện tại",trafficDistribution:"Phân bố lưu lượng",activeOnly:"Các kết nối hiện tại",activeOnlyShort:"Đang hoạt động",shareNote:"Ước tính theo lưu lượng các kết nối đang hoạt động, không phải cả ngày",toolsDesc:"Công cụ hỗ trợ kiểm tra mạng qua Mihomo API.",dnsTools:"DNS và Cache",dnsToolsHelp:"Các thao tác cache nằm trong Cài đặt và chỉ dùng API Mihomo.",openSettings:"Mở cài đặt",coreTools:"Thông tin core",coreToolsHelp:"Lõi đang chọn trong settings.ini của Box.",aboutDesc:"WebUI Dark Neon cho Box for Root, hỗ trợ Mihomo trên desktop và Android."
+  });
+  Object.assign(tr.en, {
+    tools:"Tools",about:"About",today:"Today",device:"Device",cpuFoot:"Phone CPU · root bridge needed",boxStatus:"Box status",latency:"Latency",latencyFoot:"Selected node latency",current:"Selected",trafficDistribution:"Traffic distribution",activeOnly:"Current connections",activeOnlyShort:"Active",shareNote:"Estimated from active connection bytes, not daily totals",toolsDesc:"Networking tools through the Mihomo API.",dnsTools:"DNS and Cache",dnsToolsHelp:"Cache maintenance is available in Settings through Mihomo API.",openSettings:"Open Settings",coreTools:"Core information",coreToolsHelp:"Core selected in Box settings.ini.",aboutDesc:"Dark Neon WebUI for Box for Root with Mihomo support on desktop and Android."
+  });
   let lang = localStorage.getItem("webuibox.lang") === "en" ? "en" : "vi";
-  let demo = localStorage.getItem("webuibox.demo") !== "false";
+  let demo = localStorage.getItem("webuibox.demo") === "true";
   let endpoint = localStorage.getItem("webuibox.endpoint") || (location.protocol.startsWith("http") ? location.origin : "http://127.0.0.1:9090");
   let secret = sessionStorage.getItem("webuibox.secret") || "";
   let currentPage = "overview";
@@ -124,9 +131,14 @@
     const up=Math.max(0,1600000+800000*Math.sin(tick/5)+400000*Math.sin(tick*1.21));
     updateTraffic(down,up);
     $("#total-down").textContent="12.4 GB";$("#total-up").textContent="1.6 GB";
-    $("#memory").textContent="42%";$("#memory-progress").style.width="42%";
+    $("#memory").textContent="29.6 MB";
+    $("#cpu-usage").textContent="18%";$("#cpu-progress").style.width="18%";
+    $("#system-memory").textContent="42%";$("#system-memory-progress").style.width="42%";
+    $("#system-memory-detail").textContent="2.6 / 6 GB";
     $("#uptime").textContent=prettyTime(2*86400+6*3600+38*60+tick);
     $("#connection-count").textContent="245";
+    $("#mobile-uptime").textContent=$("#uptime").textContent;
+    $("#mobile-core-state").textContent=t("preview");
   }
   function updateTraffic(down,up) {
     seriesDown.push(Math.max(0,+down||0));seriesDown.shift();
@@ -169,8 +181,13 @@
     $("#download-speed").textContent="—";$("#upload-speed").textContent="—";
     $("#total-down").textContent="—";$("#total-up").textContent="—";
     $("#memory").textContent="—";$("#memory-progress").style.width="0%";
+    $("#cpu-usage").textContent="—";$("#cpu-progress").style.width="0%";
+    $("#system-memory").textContent="—";$("#system-memory-detail").textContent="—";
+    $("#system-memory-progress").style.width="0%";
+    $("#mobile-uptime").textContent="—";$("#mobile-core-state").textContent=t("unknown");
     $("#uptime").textContent="—";$("#connection-count").textContent="—";
     $("#core-version").textContent="—";$("#connection-mode").textContent="Mihomo API";
+    $("#active-latency").textContent="—";
     renderAll();
     // Read current Box binary even when the Mihomo API is offline.
     await loadBridge();
@@ -181,6 +198,8 @@
       $("#core-indicator-text").textContent=t("running");
       $("#core-indicator").classList.remove("offline");
       $("#core-status").textContent=t("running");
+      $("#mobile-core-state").textContent=t("running");
+      $("#mobile-core-detail").textContent="Mihomo "+(v.version||"");
       $("#api-message").textContent=t("connected");
       wsTraffic=websocket("/traffic",(p)=>updateTraffic(p.down||0,p.up||0));
       wsMemory=websocket("/memory",(p)=>{if(p.inuse!=null){$("#memory").textContent=fmtBytes(p.inuse,false);$("#memory-progress").style.width="0%";}});
@@ -192,6 +211,7 @@
       $("#core-indicator-text").textContent=t("offline");
       $("#core-indicator").classList.add("offline");
       $("#core-status").textContent=t("offline");
+      $("#mobile-core-state").textContent=t("offline");
     }
   }
   function resetDemo() {
@@ -203,13 +223,14 @@
     ];
     rules=[{type:"DOMAIN-SUFFIX",payload:"google.com",proxy:"PROXY"},{type:"DOMAIN-KEYWORD",payload:"game",proxy:"PROXY"},{type:"GEOIP",payload:"VN",proxy:"DIRECT"},{type:"MATCH",payload:"",proxy:"PROXY"}];
     config={mode:"rule"};logs=[];
-    pushLog({type:"info",payload:"WebUiBox v0.0.1 · DEMO MODE"});
+    pushLog({type:"info",payload:"WebUiBox v0.0.2 · DEMO MODE"});
     pushLog({type:"info",payload:"Sample Mihomo metrics — no live data"});
     bridgeBin="mihomo";$("#core-name").textContent="mihomo";$("#core-version").textContent="v1.19.31 (demo)";
     $("#core-source").textContent="DEMO / bin_name";$("#settings-bin").textContent="mihomo (demo)";
     $("#core-warning").textContent=t("demoNote");
     $("#core-status").textContent=t("running");$("#core-indicator-text").textContent=t("preview");
     $("#core-indicator").classList.remove("offline");$("#connection-mode").textContent="Mihomo · demo";
+    $("#mobile-core-state").textContent=t("preview");$("#mobile-core-detail").textContent="Mihomo · demo";
     $("#demo-alert").classList.remove("hidden");$("#api-message").textContent="";
     seriesDown=Array.from({length:60},(_,i)=>9000000+3800000*Math.sin(i/4)+1000000*Math.sin(i*1.3));
     seriesUp=Array.from({length:60},(_,i)=>1250000+500000*Math.sin(i/4.5));
@@ -236,23 +257,87 @@
   }
   async function loadBridge(){
     try{
-      // A static status file is written by a local ROOT script; no privileged HTTP API exposed.
+      // The root bridge emits a read-only JSON file inside Mihomo SAFE_PATHS.
+      // fetch uses the page origin, so the controller's secret is not exposed to a third-party host.
       const response=await fetch(new URL("./box-status.json",location.href),{cache:"no-store"});
       if(!response.ok)throw Error("missing");
       const data=await response.json();
       const core=typeof data.bin_name==="string"?data.bin_name.trim():"";
-      if(!/^[\w-]{1,40}$/.test(core))throw Error("invalid name");
+      if(!/^(?:clash|mihomo|sing-box|xray|v2fly|hysteria|hysteria2)$/.test(core))throw Error("unknown bin");
       bridgeBin=core;
       $("#core-name").textContent=core;
       $("#settings-bin").textContent=core;
-      $("#core-source").textContent="/data/adb/box/settings.ini → bin_name";
-      $("#core-warning").textContent=t("bridgeReady")+" • "+(data.running?"process detected":"process not detected");
-      if(data.updated_at)$("#core-source").textContent+=" • "+data.updated_at;
+      $("#tools-core").textContent=core;
+      $("#core-source").textContent="settings.ini → bin_name";
+      $("#core-warning").textContent=t("bridgeReady") + " · " + (data.running ? t("running") : t("offline"));
+      const cpu=Number(data.cpu_percent);
+      if (data.cpu_percent!=null && Number.isFinite(cpu) && cpu>=0 && cpu<=100){
+        $("#cpu-usage").textContent=cpu.toFixed(0)+"%";
+        $("#cpu-progress").style.width=cpu+"%";
+      }
+      const total=Number(data.ram_total_bytes),used=Number(data.ram_used_bytes);
+      if(Number.isFinite(total)&&total>0&&Number.isFinite(used)&&used>=0){
+        const pct=Math.min(100,Math.max(0,used/total*100));
+        $("#system-memory").textContent=pct.toFixed(0)+"%";
+        $("#system-memory-progress").style.width=pct+"%";
+        $("#system-memory-detail").textContent=fmtBytes(used,false)+" / "+fmtBytes(total,false);
+      }
+      const uptime=Number(data.uptime_seconds);
+      if(Number.isFinite(uptime)&&uptime>=0){
+        $("#uptime").textContent=prettyTime(uptime);
+        $("#mobile-uptime").textContent=prettyTime(uptime);
+      }
     }catch(e){
-      bridgeBin="";$("#settings-bin").textContent="—";$("#core-name").textContent=t("unknown");
+      bridgeBin="";
+      $("#settings-bin").textContent="—";$("#tools-core").textContent="—";
+      $("#core-name").textContent=t("unknown");
       $("#core-source").textContent="settings.ini → bin_name";
       $("#core-warning").textContent=t("noBridge");
+      $("#cpu-usage").textContent="—";$("#system-memory").textContent="—";
+      $("#system-memory-detail").textContent="—";
+      $("#cpu-progress").style.width="0%";$("#system-memory-progress").style.width="0%";
     }
+  }
+  function renderTrafficShare(){
+    const dest = new Map();
+    if(demo) {
+      dest.set("SG - Singapore 01", 3940000);
+      dest.set("JP - Tokyo 01", 1620000);
+      dest.set("US - Los Angeles", 1200000);
+      dest.set("DIRECT",850000);
+    }else{
+      for(const c of connections){
+        const name=(Array.isArray(c.chains)&&c.chains[0]) || c.rule || "DIRECT";
+        const total=(Number(c.download)||0)+(Number(c.upload)||0);
+        if(Number.isFinite(total) && total>0)dest.set(name,(dest.get(name)||0)+total);
+      }
+    }
+    const groups=Array.from(dest.entries()).sort((a,b)=>b[1]-a[1]);
+    const total=groups.reduce((acc,x)=>acc+x[1],0);
+    const el=$("#traffic-donut"),list=$("#traffic-share-legend");
+    if(total===0){
+      el.style.background="conic-gradient(#183b58 0 100%)";
+      $("#donut-total").textContent="—";
+      list.innerHTML='<span class="muted">'+html(t("empty"))+'</span>'; return;
+    }
+    const colors=["#0ecaf1","#9751ff","#2d7efa","#e14baf","#ffac4f","#46628a"];
+    let offset=0, stops=[];
+    groups.slice(0,6).forEach((g,i)=>{
+      const end=Math.min(100,offset+g[1]/total*100);
+      stops.push(colors[i]+" "+offset+"% "+end+"%");
+      offset=end;
+    });
+    if(offset<100)stops.push("#46628a "+offset+"% 100%");
+    el.style.background="conic-gradient("+stops.join(",")+")";
+    $("#donut-total").textContent=fmtBytes(total,false);
+    list.innerHTML=groups.slice(0,6).map((g,i)=>{
+      const percent=g[1]/total*100;
+      return '<div class="legend-row"><i class="legend-color" style="background:'+colors[i]+'"></i><span class="legend-label">'+html(g[0])+'</span><strong class="legend-value">'+percent.toFixed(0)+'%</strong></div>';
+    }).join("");
+  }
+  function updateClock(){
+    const now=new Date();
+    $("#ui-clock").textContent=new Intl.DateTimeFormat(lang==="vi"?"vi-VN":"en-US",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false}).format(now);
   }
   function pushLog(p){
     const level=String(p.type||"info").toLowerCase();
@@ -282,9 +367,13 @@
       const p=proxies[group];const nodes=p.all.filter(n=>!q||group.toLowerCase().includes(q)||n.toLowerCase().includes(q));
       return '<article class="panel"><div class="group-title"><span>'+html(group)+' <span class="tag">'+html(p.type||"")+'</span></span><small class="muted">'+html(p.now||"")+'</small></div><div class="group-nodes">'+nodes.map(n=>proxyEntry(n,proxies[n],group,n===p.now,false)).join("")+'</div></article>';
     }).join("")||'<div class="panel muted">'+html(t("noActive"))+'</div>';
-    const primary=proxies.PROXY||proxies.GLOBAL||proxies[names[0]];
+    // Box for Root usually exposes a selector called "box"; GLOBAL often defaults to DIRECT.
+    const preferred=names.find(n=>/^box$/i.test(n)) || names.find(n=>/^proxy$/i.test(n)) || names.find(n=>n!=="GLOBAL" && /selector|urltest|fallback|loadbalance/i.test(proxies[n].type||"")) || "GLOBAL";
+    const primary=proxies[preferred]||proxies.GLOBAL||proxies[names[0]];
     const active=primary&&(primary.now||primary.all&&primary.all[0]);
     $("#active-proxy").textContent=active||"—";
+    const p=active?proxies[active]:null;
+    $("#active-latency").textContent=delayText(p);
     const list=active?([active,...(primary.all||[]).filter(n=>n!==active)].slice(0,4)):[];
     $("#quick-proxies").innerHTML=list.map(n=>proxyEntry(n,proxies[n],"",n===active,true)).join("")||'<p class="muted">—</p>';
   }
@@ -309,7 +398,7 @@
   function renderAll(){
     $("#demo-alert").classList.toggle("hidden",!demo);
     $("#demo-toggle").checked=demo;
-    renderProxies();renderConnections();renderRules();renderLogs();renderMode();drawChart();
+    renderProxies();renderConnections();renderRules();renderLogs();renderMode();renderTrafficShare();drawChart();
   }
   function compareVersions(a,b){
     const x=String(a).replace(/^v/,"").split(".").map(n=>parseInt(n,10)||0);
@@ -329,10 +418,12 @@
       lastUpdate=data;
       $("#update-link").href=url.href;
       if(compareVersions(data.version,VERSION)>0){
+        $("#header-update-dot").classList.remove("hidden");
         $("#update-dot").classList.remove("hidden");$("#update-toast").classList.remove("hidden");
         $("#update-toast-text").textContent="v"+VERSION+" → v"+data.version;
         $("#update-status").textContent=t("updateAvailable")+": v"+data.version+" — "+(data.notes&&data.notes[lang]||"");
       }else{
+        $("#header-update-dot").classList.add("hidden");
         $("#update-dot").classList.add("hidden");
         $("#update-status").textContent=t("latest")+" (v"+VERSION+")";
         if(showFeedback)notify(t("latest"));
@@ -349,6 +440,7 @@
     $("#lang-en").onclick=()=>{lang="en";localStorage.setItem("webuibox.lang",lang);translate();};
     $("#search").addEventListener("input",()=>{renderProxies();renderConnections();renderRules();});
     $("#refresh").onclick=()=>{if(demo)resetDemo();else connect();};
+    $("#update-nav").onclick=()=>navigate("updates");
     $("#connect-api").onclick=()=>navigate("settings");
     $("#api-form").addEventListener("submit",async e=>{
       e.preventDefault();
@@ -394,8 +486,13 @@
   async function start(){
     $$("[data-version]").forEach(e=>e.textContent=VERSION);
     bind();translate();navigate(location.hash.slice(1)||"overview");
+    updateClock();setInterval(updateClock,30000);
+    // Remove the old Zashboard PWA service worker, if the browser kept one for /ui/.
+    if("serviceWorker" in navigator)navigator.serviceWorker.getRegistrations().then(rs=>{
+      for(const reg of rs)if(new URL(reg.scope).pathname.startsWith(new URL("./",location.href).pathname))reg.unregister();
+    }).catch(()=>{});
     if(demo)resetDemo();else await connect();
-    setInterval(()=>{if(demo)demoSpeed();else if(live)$("#uptime").textContent=prettyTime((Date.now()-startedAt)/1000);},1000);
+    setInterval(()=>{if(demo)demoSpeed();},1000);
     setInterval(()=>{if(live&&!demo)refreshAll();},6500);
     setInterval(()=>{if(!demo)loadBridge();},12000);
     setInterval(()=>checkUpdates(false),6*60*60*1000);
