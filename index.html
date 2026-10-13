@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#070e1c">
   <meta name="description" content="WebUiBox — Dark Neon dashboard for Mihomo and Box for Root">
-  <title>WebUiBox • v0.0.1</title>
+  <title>WebUiBox • v0.0.2</title>
   <link rel="stylesheet" href="./styles.css">
   <script defer src="./app.js"></script>
 </head>
@@ -14,7 +14,7 @@
   <aside class="sidebar" aria-label="Navigation">
     <a href="#overview" class="brand">
       <div class="brand-logo">⬡</div>
-      <div><strong>WebUi<span>Box</span></strong><small>v<span data-version>0.0.1</span> · Box for Root Web UI</small></div>
+      <div><strong>WebUi<span>Box</span></strong><small>v<span data-version>0.0.2</span> · Box for Root Web UI</small></div>
     </a>
     <nav id="desktop-nav" class="sidebar-nav">
       <button data-nav="overview" class="active"><span class="nav-icon">⌂</span><span data-i="overview">Tổng quan</span></button>
@@ -23,44 +23,52 @@
       <button data-nav="rules"><span class="nav-icon">⚑</span><span data-i="rules">Quy tắc</span></button>
       <button data-nav="logs"><span class="nav-icon">≡</span><span data-i="logs">Nhật ký</span></button>
       <button data-nav="settings"><span class="nav-icon">⚙</span><span data-i="settings">Cài đặt</span></button>
-      <button data-nav="updates"><span class="nav-icon">⟳</span><span data-i="updates">Cập nhật</span><i id="update-dot" class="dot hidden"></i></button>
+      <button data-nav="updates"><span class="nav-icon">⟳</span><span data-i="updates">Cập nhật</span><i id="update-dot" class="dot hidden"></i></button><button data-nav="tools"><span class="nav-icon">⚒</span><span data-i="tools">Công cụ</span></button><button data-nav="about"><span class="nav-icon">ⓘ</span><span data-i="about">Giới thiệu</span></button>
     </nav>
     <div class="sidebar-bottom">
-      <div class="version-card"><span class="cube">⬡</span><div><strong>WebUiBox</strong><small>v<span data-version>0.0.1</span> <span class="live-dot"></span></small></div></div>
+      <div class="version-card"><span class="cube">⬡</span><div><strong>WebUiBox</strong><small>v<span data-version>0.0.2</span> <span class="live-dot"></span></small></div></div>
       <a href="https://github.com/lemanhquyen20004/webuibox" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <small>© WebUiBox · MIT</small>
     </div>
   </aside>
   <div class="workspace">
     <header class="topbar">
-      <div class="mobile-brand"><span class="cube">⬡</span><strong>WebUi<span>Box</span></strong><small>v<span data-version>0.0.1</span></small></div>
+      <div class="mobile-brand"><span class="cube">⬡</span><strong>WebUi<span>Box</span></strong><small>v<span data-version>0.0.2</span></small></div>
       <div class="search-box"><span>⌕</span><input id="search" placeholder="Tìm máy chủ, quy tắc, kết nối... / Search" autocomplete="off"></div>
       <div class="header-actions">
         <div id="core-indicator" class="core-indicator offline"><span class="live-dot"></span><span id="core-indicator-text">Chưa kết nối</span></div>
-        <button id="refresh" class="icon-button" title="Refresh" aria-label="Refresh">⟳</button>
+        <button id="refresh" class="icon-button" title="Refresh" aria-label="Refresh">⟳</button><button id="update-nav" class="icon-button notification-bell" title="Updates" aria-label="Updates">♧<span id="header-update-dot" class="bell-dot hidden"></span></button>
         <div class="languages"><button id="lang-vi" class="selected">VI</button><button id="lang-en">EN</button></div>
       </div>
     </header>
     <main id="main" class="main">
       <section id="page-overview" class="page active">
-        <div class="page-heading"><div><h1 data-i="overview">Tổng quan</h1><p data-i="overviewDesc">Giám sát Box, máy chủ và lưu lượng theo thời gian thực.</p></div><div class="uptime-card"><span>◷ <span data-i="uptime">Thời gian hoạt động</span></span><strong id="uptime">—</strong></div></div>
+        <div class="page-heading"><div><h1 data-i="overview">Tổng quan</h1><p data-i="overviewDesc">Giám sát Box, máy chủ và lưu lượng theo thời gian thực.</p></div><div class="heading-info"><div class="date-card"><span>◷ <span data-i="today">Hôm nay</span></span><strong id="ui-clock">—</strong></div><div class="uptime-card"><span>◷ <span data-i="uptime">Thời gian hoạt động</span></span><strong id="uptime">—</strong></div></div></div>
         <div id="demo-alert" class="notice demo hidden"><span>◈</span><span data-i="demoNote">Đây là dữ liệu minh họa. Kết nối Mihomo API để xem dữ liệu thật.</span><button id="connect-api" class="small-button" data-i="connect">Kết nối</button></div>
+
+        <div class="phone-status"><div class="mini-status"><span class="live-dot"></span><div><strong id="mobile-core-state" data-i="status">Trạng thái</strong><small id="mobile-core-detail">Mihomo API</small></div></div><div class="mini-uptime"><span data-i="uptime">Thời gian hoạt động</span><strong id="mobile-uptime">—</strong></div></div>
         <div class="stats-grid">
-          <article class="stat cyan"><div class="stat-label"><span class="sq-icon">↓</span><span data-i="download">Tải xuống</span></div><div class="stat-big" id="download-speed">—</div><div class="sparkline" id="down-spark"></div><small><span data-i="totalDown">Tổng tải xuống</span> <span id="total-down">—</span></small></article>
-          <article class="stat violet"><div class="stat-label"><span class="sq-icon">↑</span><span data-i="upload">Tải lên</span></div><div class="stat-big" id="upload-speed">—</div><div class="sparkline" id="up-spark"></div><small><span data-i="totalUp">Tổng tải lên</span> <span id="total-up">—</span></small></article>
-          <article class="stat green"><div class="stat-label"><span class="sq-icon">◉</span><span data-i="status">Trạng thái</span></div><div class="stat-big status-label" id="core-status">—</div><div class="status-note" id="connection-mode">Mihomo API</div></article>
-          <article class="stat purple"><div class="stat-label"><span class="sq-icon">▥</span><span>RAM · Mihomo</span></div><div class="stat-big" id="memory">—</div><div class="progress"><span id="memory-progress"></span></div><small data-i="memoryNote">Bộ nhớ core, không phải RAM toàn điện thoại.</small></article>
+          <article class="stat cyan stat-download"><div class="stat-label"><span class="sq-icon">↓</span><span data-i="download">Tải xuống</span></div><div class="stat-big" id="download-speed">—</div><div class="sparkline" id="down-spark"></div><small><span data-i="totalDown">Tổng tải xuống</span> <strong id="total-down">—</strong></small></article>
+          <article class="stat violet stat-upload"><div class="stat-label"><span class="sq-icon">↑</span><span data-i="upload">Tải lên</span></div><div class="stat-big" id="upload-speed">—</div><div class="sparkline" id="up-spark"></div><small><span data-i="totalUp">Tổng tải lên</span> <strong id="total-up">—</strong></small></article>
+          <article class="stat green stat-cpu"><div class="stat-label"><span class="sq-icon">▣</span><span>CPU <small data-i="device">Thiết bị</small></span></div><div class="stat-big" id="cpu-usage">—</div><div class="progress"><span id="cpu-progress"></span></div><small data-i="cpuFoot">CPU toàn máy · cần bridge root</small></article>
+          <article class="stat purple stat-memory"><div class="stat-label"><span class="sq-icon">▥</span><span>RAM <small data-i="device">Thiết bị</small></span></div><div class="stat-big" id="system-memory">—</div><div class="progress"><span id="system-memory-progress"></span></div><small><span id="system-memory-detail">—</span> <span class="core-memory-inline">· Core: <span id="memory">—</span></span></small><span id="memory-progress" class="hidden"></span></article>
         </div>
         <div class="overview-grid">
-          <article class="panel current-core"><div class="panel-title"><h2 data-i="currentCore">Core / Binary hiện tại</h2><span class="tag" data-i="fromBox">Theo Box</span></div><div class="core-detail"><div class="terminal-icon">❯_</div><div><strong id="core-name">Chưa có dữ liệu</strong><span id="core-version">—</span><small id="core-source">settings.ini → bin_name</small></div></div><p id="core-warning" class="muted small">Kết nối bridge để đọc bin_name của Box.</p></article>
-          <article class="panel"><div class="panel-title"><h2 data-i="selectedProxy">Proxy đang sử dụng</h2></div><div id="active-proxy" class="selected-proxy"><span class="muted">—</span></div></article>
-          <article class="panel"><div class="panel-title"><h2 data-i="connections">Kết nối</h2></div><div id="connection-count" class="big-number">—</div><small data-i="activeSessions">Phiên hiện tại</small></article>
+          <article class="panel panel-box-status"><div class="panel-title"><h2 data-i="boxStatus">Trạng thái Box</h2></div><div class="large-status"><div class="status-ring"><span class="live-dot"></span></div><div><strong id="core-status">—</strong><small id="connection-mode">Mihomo API</small></div></div></article>
+          <article class="panel current-core"><div class="panel-title"><h2 data-i="currentCore">Core / Binary hiện tại</h2><span class="tag" data-i="fromBox">Theo Box</span></div><div class="core-detail"><div class="terminal-icon">❯_</div><div><strong id="core-name">Chưa xác định</strong><span id="core-version">—</span><small id="core-source">settings.ini → bin_name</small></div></div><p id="core-warning" class="muted small">Đang chờ bridge.</p></article>
+          <article class="panel panel-latency"><div class="panel-title"><h2 data-i="latency">Độ trễ / Latency</h2></div><div class="latency-big" id="active-latency">—</div><div class="latency-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><small data-i="latencyFoot">Độ trễ node đã chọn</small></article>
+          <article class="panel panel-connections"><div class="panel-title"><h2 data-i="connections">Kết nối</h2></div><div id="connection-count" class="big-number">—</div><div class="micro-waves" aria-hidden="true"></div><small data-i="activeSessions">Phiên hiện tại</small></article>
         </div>
-        <div class="content-grid">
+        <article class="panel mobile-selected-proxy"><div class="panel-title"><h2 data-i="selectedProxy">Proxy đang sử dụng</h2><span class="tag" data-i="current">Hiện tại</span></div><div id="active-proxy" class="selected-proxy">—</div></article>
+        <div class="content-grid overview-middle">
           <article class="panel traffic-panel"><div class="panel-title"><h2 data-i="traffic">Lưu lượng theo thời gian</h2><div class="chart-legend"><span class="cyan-circle"></span> ↓ <span class="purple-circle"></span> ↑</div></div><canvas id="traffic-chart" height="180" aria-label="Live traffic"></canvas><div class="chart-sub" data-i="realTime">Thời gian thực • 60 mẫu gần nhất</div></article>
-          <article class="panel"><div class="panel-title"><h2 data-i="quickProxies">Máy chủ / Proxy</h2><button class="link-button" data-goto="proxies" data-i="seeAll">Xem tất cả →</button></div><div id="quick-proxies" class="proxy-list"><p class="muted">—</p></div></article>
+          <article class="panel traffic-share-panel"><div class="panel-title"><h2 data-i="trafficDistribution">Phân bố lưu lượng</h2><span class="tag" data-i="activeOnly">Các kết nối hiện tại</span></div><div class="donut-layout"><div id="traffic-donut" class="donut"><div><span data-i="activeOnlyShort">Đang hoạt động</span><strong id="donut-total">—</strong></div></div><div id="traffic-share-legend" class="donut-legend"><span class="muted">—</span></div></div><small class="donut-foot" data-i="shareNote">Ước tính theo kết nối đang hoạt động, không phải lưu lượng cả ngày</small></article>
         </div>
-        <div class="content-grid"><article class="panel"><div class="panel-title"><h2 data-i="recentConnections">Kết nối gần đây</h2><button class="link-button" data-goto="connections" data-i="seeAll">Xem tất cả →</button></div><div id="recent-connections" class="list-table">—</div></article><article class="panel"><div class="panel-title"><h2 data-i="recentLogs">Nhật ký mới</h2><button class="link-button" data-goto="logs" data-i="seeAll">Xem tất cả →</button></div><div id="recent-logs" class="log-lines"></div></article></div>
+        <div class="content-grid overview-bottom">
+          <article class="panel"><div class="panel-title"><h2 data-i="quickProxies">Proxy / Máy chủ</h2><button class="link-button" data-goto="proxies" data-i="seeAll">Xem tất cả →</button></div><div id="quick-proxies" class="proxy-list"><p class="muted">—</p></div></article>
+          <article class="panel"><div class="panel-title"><h2 data-i="recentConnections">Kết nối gần đây</h2><button class="link-button" data-goto="connections" data-i="seeAll">Xem tất cả →</button></div><div id="recent-connections" class="list-table">—</div></article>
+          <article class="panel"><div class="panel-title"><h2 data-i="recentLogs">Nhật ký hệ thống</h2><button class="link-button" data-goto="logs" data-i="seeAll">Xem tất cả →</button></div><div id="recent-logs" class="log-lines"></div></article>
+        </div>
       </section>
       <section id="page-proxies" class="page"><div class="page-heading"><div><h1 data-i="proxies">Máy chủ</h1><p data-i="proxiesDesc">Chọn node, kiểm tra độ trễ và cập nhật subscription.</p></div><button id="refresh-providers" class="primary-button" data-i="refreshProviders">Cập nhật providers</button></div><div id="proxy-groups" class="stack"></div></section>
       <section id="page-connections" class="page"><div class="page-heading"><div><h1 data-i="connections">Kết nối</h1><p data-i="connectionsDesc">Quan sát và ngắt phiên kết nối đang chạy.</p></div><button id="close-all" class="danger-button" data-i="closeAll">Ngắt tất cả</button></div><div class="panel table-panel"><div id="connection-table" class="list-table"></div></div></section>
@@ -72,11 +80,13 @@
         <div class="panel"><h2 data-i="boxBridge">Box core detection</h2><p data-i="boxBridgeDesc">WebUiBox đọc /data/adb/box/settings.ini qua file trạng thái do bridge root tạo. Trình duyệt không có quyền truy cập trực tiếp.</p><div class="code-note">bin_name → <strong id="settings-bin">—</strong></div><p class="muted small" data-i="bridgeNote">Cài scripts/box-status.sh để hiển thị chính xác core.</p></div>
         <div class="panel"><h2 data-i="appearance">Giao diện</h2><p data-i="appearanceDesc">Dark Neon • hiệu ứng nhẹ • điện thoại và desktop • tiếng Việt / English.</p><label class="toggle-line"><input id="demo-toggle" type="checkbox"><span data-i="demoMode">Bật dữ liệu demo (minh họa)</span></label><p class="muted small" data-i="demoSafety">Chế độ demo không gửi lệnh đến Mihomo.</p></div>
       </div></section>
-      <section id="page-updates" class="page"><div class="page-heading"><div><h1 data-i="updates">Cập nhật</h1><p data-i="updatesDesc">Kiểm tra phiên bản WebUiBox trên GitHub.</p></div><button id="check-updates" class="primary-button" data-i="checkUpdates">Kiểm tra cập nhật</button></div><div class="panel update-panel"><div class="update-emblem">⬡</div><h2>WebUiBox <span data-version>0.0.1</span></h2><p id="update-status" data-i="latestHint">Đang dùng v0.0.1. Kiểm tra phiên bản mới để nhận thông báo.</p><p class="muted small" data-i="updateMethod">Cập nhật an toàn: xem Release trên GitHub, sau đó chạy script cập nhật có xác minh SHA-256.</p><a id="update-link" class="primary-button" href="https://github.com/lemanhquyen20004/webuibox/releases" target="_blank" rel="noopener noreferrer" data-i="viewReleases">Xem bản phát hành →</a></div></section>
+      <section id="page-tools" class="page"><div class="page-heading"><div><h1 data-i="tools">Công cụ</h1><p data-i="toolsDesc">Các thao tác an toàn sử dụng API Mihomo.</p></div></div><div class="settings-grid"><article class="panel"><h2 data-i="dnsTools">DNS &amp; Cache</h2><p class="muted" data-i="dnsToolsHelp">Xóa cache DNS và Fake-IP khi cần chẩn đoán mạng.</p><div class="action-grid tools-actions"><button class="small-button" data-goto="settings" data-i="openSettings">Mở cài đặt</button></div></article><article class="panel"><h2 data-i="coreTools">Thông tin core</h2><p class="muted" data-i="coreToolsHelp">Trạng thái bin_name trong settings.ini và phiên bản Mihomo API.</p><div class="code-note">bin_name: <span id="tools-core">—</span></div></article></div></section>
+      <section id="page-about" class="page"><div class="page-heading"><div><h1 data-i="about">Giới thiệu</h1><p>WebUiBox · Dark Neon · VI / EN</p></div></div><article class="panel about-panel"><div class="update-emblem">⬡</div><h2>WebUiBox v<span data-version>0.0.2</span></h2><p data-i="aboutDesc">Giao diện quản lý Mihomo dành cho Box for Root, tối ưu trên điện thoại và máy tính.</p><a class="primary-button" href="https://github.com/lemanhquyen20004/webuibox" target="_blank" rel="noopener noreferrer">GitHub ↗</a></article></section>
+      <section id="page-updates" class="page"><div class="page-heading"><div><h1 data-i="updates">Cập nhật</h1><p data-i="updatesDesc">Kiểm tra phiên bản WebUiBox trên GitHub.</p></div><button id="check-updates" class="primary-button" data-i="checkUpdates">Kiểm tra cập nhật</button></div><div class="panel update-panel"><div class="update-emblem">⬡</div><h2>WebUiBox <span data-version>0.0.2</span></h2><p id="update-status" data-i="latestHint">Đang dùng v0.0.2. Kiểm tra phiên bản mới để nhận thông báo.</p><p class="muted small" data-i="updateMethod">Cập nhật an toàn: xem Release trên GitHub, sau đó chạy script cập nhật có xác minh SHA-256.</p><a id="update-link" class="primary-button" href="https://github.com/lemanhquyen20004/webuibox/releases" target="_blank" rel="noopener noreferrer" data-i="viewReleases">Xem bản phát hành →</a></div></section>
     </main>
     <div id="update-toast" class="update-toast hidden"><span class="cube">⬡</span><div><strong data-i="newUpdate">Có phiên bản WebUiBox mới</strong><small id="update-toast-text">—</small></div><button id="open-update" class="primary-button" data-i="details">Chi tiết</button><button id="dismiss-update" class="icon-button" aria-label="Close">×</button></div>
   </div>
-  <nav id="mobile-nav" class="mobile-nav"><button data-nav="overview" class="active"><b>⌂</b><span data-i="overview">Tổng quan</span></button><button data-nav="proxies"><b>▱</b><span data-i="proxies">Máy chủ</span></button><button data-nav="connections"><b>⌘</b><span data-i="connections">Kết nối</span></button><button data-nav="logs"><b>≡</b><span data-i="logs">Nhật ký</span></button><button data-nav="settings"><b>⚙</b><span data-i="settings">Cài đặt</span></button><button data-nav="updates"><b>⟳</b><span data-i="updates">Cập nhật</span></button></nav>
+  <nav id="mobile-nav" class="mobile-nav"><button data-nav="overview" class="active"><b>⌂</b><span data-i="overview">Tổng quan</span></button><button data-nav="proxies"><b>◇</b><span data-i="proxies">Máy chủ</span></button><button data-nav="connections"><b>⌘</b><span data-i="connections">Kết nối</span></button><button data-nav="logs"><b>≡</b><span data-i="logs">Nhật ký</span></button><button data-nav="settings"><b>⚙</b><span data-i="settings">Cài đặt</span></button></nav>
 </div>
 <div id="notification" class="notification hidden" role="status"></div>
 </body>
