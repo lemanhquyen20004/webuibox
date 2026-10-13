@@ -1,0 +1,44 @@
+name: Verify and package WebUiBox
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test
+        run: npm test
+      - name: Package
+        shell: bash
+        run: |
+          set -euo pipefail
+          V="$(node -p "require('./package.json').version")"
+          FILE="webuibox-v$V.zip"
+          zip -q -r "$FILE" index.html styles.css app.js update.json bridge scripts LICENSE README.md README_vi.md package.json
+          sha256sum "$FILE" > "$FILE.sha256"
+          echo "FILE=$FILE" >> "$GITHUB_ENV"
+          echo "V=$V" >> "$GITHUB_ENV"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: webuibox-build
+          path: |
+            webuibox-v*.zip
+            webuibox-v*.zip.sha256
+      - name: Create release for version tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "v$V" || { echo "Tag/version mismatch"; exit 1; }
+          gh release create "$GITHUB_REF_NAME" "$FILE" "$FILE.sha256" --title "WebUiBox $GITHUB_REF_NAME" --notes "Dark Neon WebUiBox / Mihomo dashboard"
