@@ -1,0 +1,9 @@
+{
+  "name": "WebUiBox",
+  "version": "0.0.1",
+  "release_url": "https://github.com/lemanhquyen20004/webuibox/releases",
+  "notes": {
+    "vi": "Giao diện Dark Neon, Mihomo API, bridge Box bin_name và kiểm tra cập nhật.",
+    "en": "Initial Dark Neon UI, Mihomo API, Box core detector and update checker."
+  }
+}
