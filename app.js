@@ -367,7 +367,9 @@
       const p=proxies[group];const nodes=p.all.filter(n=>!q||group.toLowerCase().includes(q)||n.toLowerCase().includes(q));
       return '<article class="panel"><div class="group-title"><span>'+html(group)+' <span class="tag">'+html(p.type||"")+'</span></span><small class="muted">'+html(p.now||"")+'</small></div><div class="group-nodes">'+nodes.map(n=>proxyEntry(n,proxies[n],group,n===p.now,false)).join("")+'</div></article>';
     }).join("")||'<div class="panel muted">'+html(t("noActive"))+'</div>';
-    const primary=proxies.PROXY||proxies.GLOBAL||proxies[names[0]];
+    // Box for Root usually exposes a selector called "box"; GLOBAL often defaults to DIRECT.
+    const preferred=names.find(n=>/^box$/i.test(n)) || names.find(n=>/^proxy$/i.test(n)) || names.find(n=>n!=="GLOBAL" && /selector|urltest|fallback|loadbalance/i.test(proxies[n].type||"")) || "GLOBAL";
+    const primary=proxies[preferred]||proxies.GLOBAL||proxies[names[0]];
     const active=primary&&(primary.now||primary.all&&primary.all[0]);
     $("#active-proxy").textContent=active||"—";
     const p=active?proxies[active]:null;
