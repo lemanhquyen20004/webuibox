@@ -1,4 +1,4 @@
-# WebUiBox v0.0.2
+# WebUiBox v0.0.3
 
 **Dark Neon Box for Root dashboard** for Mihomo/Clash Meta on Android root. UI rebuilt for the approved desktop/mobile reference, with Vietnamese/English switching.
 
@@ -19,7 +19,7 @@
 
 **This ZIP is NOT a flashable Magisk module.**
 
-1. Back up /data/adb/box/clash/config.yaml and existing UI folder. Download webuibox-v0.0.2.zip from the release, extract its contents.
+1. Back up /data/adb/box/clash/config.yaml and existing UI folder. Download webuibox-v0.0.3.zip from the release, extract its contents.
 2. Use MT Manager root access to copy the files under **/data/adb/box/clash/webuibox/**. index.html, app.js, styles.css and update.json must be directly inside that folder; bridge/box-status.sh goes inside its bridge/ subfolder.
 3. While Box/Mihomo is stopped, edit the existing /data/adb/box/clash/config.yaml and set, **without duplicate keys**:
 
@@ -45,7 +45,7 @@ Releases are packaged by GitHub Actions when package.json/update.json contain th
 
         su -c sh /data/adb/box/clash/webuibox/scripts/update.sh
 
-This needs HTTPS curl/wget and unzip, asks permission, verifies SHA-256, then invokes the installer and backs up the previous WebUI. If you are on v0.0.1 at /data/adb/box/webuibox, install v0.0.2 manually or with the new install script first, since the updater now uses Mihomo's safe-path location.
+This needs HTTPS curl/wget and unzip, asks permission, verifies SHA-256, then invokes the installer and backs up the previous WebUI. If you are on v0.0.1 at /data/adb/box/webuibox, install v0.0.3 manually or with the new install script first, since the updater now uses Mihomo's safe-path location.
 
 Do not use Box's **box.tool upxui** after switching WebUI if you want to keep it: that command downloads Zashboard into the default **clash/dashboard** directory. WebUiBox uses its own directory instead.
 
@@ -56,3 +56,20 @@ Bind Mihomo external-controller only to 127.0.0.1 and use a strong secret. Never
 The dashboard is an independent implementation; [Zashboard](https://github.com/Zephyruso/zashboard) is a separate project used as a UI reference.
 
 © 2026 lemanhquyen20004 · MIT.
+
+## New v0.0.3: Hotspot Manager (opt-in Root Android Beta)
+
+The Hotspot page provides an estimated client list from /proc/net/arp, optional IPv4 block and per-IP MB quota using two dedicated iptables mangle chains, and an experimental Android 11 hotspot toggle guarded by explicit local opt-in.
+
+**Not guaranteed:** IP/MAC rotation, IPv6, hardware tethering offload and OEM Android routing may bypass counters. Quota counters are session-bound and not carrier-accurate. Device support has NOT been verified on the Redmi Note 8T MIUI build.
+
+**Set up with MT Manager:**
+- Back up the existing UI folder, extract v0.0.3 ZIP and copy all files (including hotspot.js and hotspot/webuibox-hotspot-arm64) into /data/adb/box/clash/webuibox.
+- Keep external-ui configured for that folder in Mihomo.
+- Run scripts/enable-hotspot.sh with root from a trusted command runner. This opts into launching a local root service at next boot; it does NOT turn Wi-Fi tethering on.
+- Reboot. Use root access to read /data/adb/webuibox-private/hotspot/access.key and enter it into WebUiBox Hotspot -> Connect Backend.
+- Toggle hotspot through Android Settings by default. Test on a spare client; rollback with scripts/disable-hotspot.sh as root and reboot.
+
+Only if you have confirmed Android 11 binder calls are safe on your exact ROM, create a root-owned /data/adb/webuibox-private/hotspot/allow-android11-binder marker to enable the experimental toggle buttons. Binder transactions 47/49 are NOT universal to Xiaomi MIUI. The UI only confirms submission of the command, not a successful hotspot state change.
+
+Do not publicly expose port 9097 or the key; keep the controller bound to 127.0.0.1.
