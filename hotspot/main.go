@@ -56,7 +56,65 @@ type Server struct {
  token string
 }
 var validMAC=regexp.MustCompile(`(?i)^([0-9a-f]{2}:){5}[0-9a-f]{2}$`)
-var validIP=regexp.MustCompile(`^[0-9]{1,3}(.[0-9]{1,3}){3}$`)
+var validIP=regexp.MustCompile(`^[0-9]{1,3}(\.[0-9]{1,3}){3}package main
+
+// WebUiBox hotspot daemon for rooted Android. Localhost ONLY.
+// Limitations: Android 11 binder methods vary across OEM builds; traffic quotas
+// count IPv4 iptables packets, and may miss IPv6 or hardware-offloaded flows.
+import (
+ "crypto/rand"
+ "crypto/subtle"
+ "encoding/hex"
+ "encoding/json"
+ "errors"
+ "fmt"
+ "log"
+ "net"
+ "net/http"
+ "os"
+ "os/exec"
+ "path/filepath"
+ "regexp"
+ "strconv"
+ "strings"
+ "sync"
+ "time"
+)
+
+const (
+ base = "/data/adb/box/clash/webuibox/hotspot"
+ port = "127.0.0.1:9097"
+ chainIn = "WUBX_IN"
+ chainOut = "WUBX_OUT"
+)
+type Client struct {
+ IP string `json:"ip"`
+ MAC string `json:"mac"`
+ Interface string `json:"interface"`
+ Upload uint64 `json:"upload"`
+ Download uint64 `json:"download"`
+ Limit uint64 `json:"limit"`
+ Blocked bool `json:"blocked"`
+ QuotaReached bool `json:"quota_reached"`
+}
+type Rule struct {
+ IP string `json:"ip"`
+ MAC string `json:"mac"`
+ Interface string `json:"interface"`
+ Limit uint64 `json:"limit"`
+ Blocked bool `json:"blocked"`
+ QuotaReached bool `json:"quota_reached"`
+}
+type state struct {
+ Rules map[string]Rule `json:"rules"`
+}
+type Server struct {
+ mu sync.Mutex
+ state state
+ token string
+}
+var validMAC=regexp.MustCompile(`(?i)^([0-9a-f]{2}:){5}[0-9a-f]{2}$`)
+var validIP=regexp.MustCompile()
 var activeIface=regexp.MustCompile(`^(ap[0-9]*|swlan[0-9]*|wlan[1-9][0-9]*|softap[0-9]*)$`)
 func cmd(name string,args ...string)(string,error){
  c:=exec.Command(name,args...);c.Env=[]string{"PATH=/system/bin:/system/xbin:/vendor/bin:/data/adb/magisk"}
@@ -180,6 +238,19 @@ func usage(chain,ip string)uint64{
 func (s *Server)clientStatus()(string,[]Client){
  iface:=findHotspotInterface()
  clients:=peers(iface)
+ // Expire device rules if the ARP mapping disappears or changes.
+ active:=map[string]string{}
+ for _,client:=range clients{active[client.IP]=client.MAC}
+ for ip,r:=range s.state.Rules{
+  if active[ip]!=r.MAC || iface!=r.Interface{
+   removeRule(chainIn,"-s",ip,"DROP")
+   removeRule(chainOut,"-d",ip,"DROP")
+   removeRule(chainIn,"-s",ip,"RETURN")
+   removeRule(chainOut,"-d",ip,"RETURN")
+   delete(s.state.Rules,ip)
+   _=s.save()
+  }
+ }
  for i:=range clients{
   c:=&clients[i]
   if r,ok:=s.state.Rules[c.IP];ok && r.MAC==c.MAC && r.Interface==iface{
@@ -275,8 +346,13 @@ func main(){
   _=json.Unmarshal(file,&s.state)
   if s.state.Rules==nil{s.state.Rules=map[string]Rule{}}
  }
- // Rules intentionally not restored automatically after reboot; admin must reapply.
- s.state.Rules=map[string]Rule{}
+ // A reboot may leave stale DROP rules if the service process restarts.
+ // Flush ONLY our dedicated chains (never Android/Box built-in firewall chains).
+ for _,ch:=range []string{chainIn,chainOut}{
+  if _,err:=iptOutput("-L",ch,"-n");err==nil{_ = ipt("-F",ch)}
+ }
+ // Counters are session-only; do not claim persistence after restarting the service.
+ s.state.Rules=map[string]Rule{};_ = s.save()
  mux:=http.NewServeMux();mux.HandleFunc("/api/v1/",s.handler)
  server:=&http.Server{Addr:port,Handler:mux,ReadHeaderTimeout:5*time.Second,ReadTimeout:10*time.Second,WriteTimeout:12*time.Second,IdleTimeout:15*time.Second}
  log.Printf("WebUiBox hotspot beta backend on %s",port)
