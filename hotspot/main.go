@@ -353,6 +353,16 @@ func main(){
  }
  // Counters are session-only; do not claim persistence after restarting the service.
  s.state.Rules=map[string]Rule{};_ = s.save()
+ // Enforce active IPv4 session quotas even when the browser is closed.
+ // Reading iptables counters is intentionally limited to once every 5 seconds.
+ go func(){
+  ticker:=time.NewTicker(5*time.Second);defer ticker.Stop()
+  for range ticker.C {
+   s.mu.Lock()
+   if len(s.state.Rules)>0 {_,_ = s.clientStatus()}
+   s.mu.Unlock()
+  }
+ }()
  mux:=http.NewServeMux();mux.HandleFunc("/api/v1/",s.handler)
  server:=&http.Server{Addr:port,Handler:mux,ReadHeaderTimeout:5*time.Second,ReadTimeout:10*time.Second,WriteTimeout:12*time.Second,IdleTimeout:15*time.Second}
  log.Printf("WebUiBox hotspot beta backend on %s",port)
