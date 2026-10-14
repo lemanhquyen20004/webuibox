@@ -1,6 +1,6 @@
-# WebUiBox v0.0.3 — Giao diện Dark Neon
+# WebUiBox v0.0.4 — Giao diện Dark Neon
 
-Đây là WebUI dành cho **Box for Magisk / Box for Root khi chạy Mihomo (Clash Meta)**. Bản v0.0.3 thiết kế lại theo ảnh demo desktop + điện thoại đã duyệt. Hỗ trợ **Tiếng Việt và English**.
+Đây là WebUI dành cho **Box for Magisk / Box for Root khi chạy Mihomo (Clash Meta)**. Bản v0.0.4 thiết kế lại theo ảnh demo desktop + điện thoại đã duyệt. Hỗ trợ **Tiếng Việt và English**.
 
 [English](README.md)
 
@@ -23,7 +23,7 @@
 **Không flash file ZIP này bằng Magisk.** Đây là gói WebUI.
 
 1. Sao lưu file /data/adb/box/clash/config.yaml và thư mục WebUI cũ.
-2. Tải **webuibox-v0.0.3.zip** tại mục Releases, mở trong MT Manager và giải nén.
+2. Tải **webuibox-v0.0.4.zip** tại mục Releases, mở trong MT Manager và giải nén.
 3. Copy file trực tiếp vào **/data/adb/box/clash/webuibox/**:
 
         /data/adb/box/clash/webuibox/
@@ -57,13 +57,13 @@ Khi GitHub update.json có version mới, trang Cập nhật sẽ hiện thông 
 
         su -c sh /data/adb/box/clash/webuibox/scripts/update.sh
 
-Script hỏi trước, tải Release ZIP và SHA-256, so khớp rồi thay UI và sao lưu bản cũ. Bản v0.0.1 cũ ở thư mục /data/adb/box/webuibox cần chuyển/cài v0.0.3 một lần để dùng đường dẫn cập nhật mới.
+Script hỏi trước, tải Release ZIP và SHA-256, so khớp rồi thay UI và sao lưu bản cũ. Bản v0.0.1 cũ ở thư mục /data/adb/box/webuibox cần chuyển/cài v0.0.4 một lần để dùng đường dẫn cập nhật mới.
 
 **Không chạy lệnh box.tool upxui** sau khi đổi giao diện nếu muốn giữ WebUiBox, vì Box tải Zashboard vào /data/adb/box/clash/dashboard. Để tránh bị ghi đè, WebUiBox được tách riêng thành clash/webuibox.
 
 © 2026 lemanhquyen20004 · MIT.
 
-## Mới v0.0.3: Hotspot Manager (Android root Beta)
+## Mới v0.0.4: Hotspot Manager (Android root Beta)
 
 WebUI có thêm mục **Phát Wi-Fi**: xem trạng thái điểm phát, thiết bị kết nối (ước lượng từ /proc/net/arp), chặn/bỏ chặn IPv4 và hạn mức MB theo bộ đếm iptables IPv4.
 
@@ -71,7 +71,7 @@ WebUI có thêm mục **Phát Wi-Fi**: xem trạng thái điểm phát, thiết 
 
 **Cài qua MT Manager root:**
 
-1. Sao lưu thư mục /data/adb/box/clash/webuibox và config.yaml. Giải nén ZIP v0.0.3 rồi chép file vào /data/adb/box/clash/webuibox (thêm hotspot.js và hotspot/webuibox-hotspot-arm64).
+1. Sao lưu thư mục /data/adb/box/clash/webuibox và config.yaml. Giải nén ZIP v0.0.4 rồi chép file vào /data/adb/box/clash/webuibox (thêm hotspot.js và hotspot/webuibox-hotspot-arm64).
 2. Giữ external-ui của Mihomo là /data/adb/box/clash/webuibox.
 3. Chạy /data/adb/box/clash/webuibox/scripts/enable-hotspot.sh bằng quyền root bằng công cụ chạy script phù hợp. Lệnh này chỉ tạo dịch vụ chạy backend lúc boot, không tự bật hotspot, không sửa firewall Box.
 4. Khởi động lại điện thoại. Mở MT Manager root, tìm access.key trong /data/adb/webuibox-private/hotspot/access.key. Dán key vào trang Phát Wi-Fi -> Kết nối Backend. **Không chia sẻ key này.**
@@ -80,3 +80,17 @@ WebUI có thêm mục **Phát Wi-Fi**: xem trạng thái điểm phát, thiết 
 **Nút bật/tắt hotspot chỉ là bản thử nghiệm:** Một số bản Android 11 sử dụng service call wifi 47/49, nhưng số giao dịch Binder khác nhau theo ROM. Chức năng mặc định **vô hiệu**. Chỉ khi bạn đã tự xác minh phương thức trên thiết bị cụ thể và tạo file /data/adb/webuibox-private/hotspot/allow-android11-binder thì nút mới cho gửi yêu cầu. Lệnh trả về không đồng nghĩa hotspot bật/tắt thành công. Không tạo file này nếu chưa biết ROM có hỗ trợ.
 
 Không đưa cổng 9097 ra Internet hoặc Cloudflare. Việc bật/tắt trên MIUI của Redmi Note 8T chưa được bảo đảm. WebUI hiện có chức năng bản beta chứ chưa phải ứng dụng quản lý hotspot hoàn thiện.
+
+
+## Mới v0.0.4 — Cập nhật ngay trong WebUiBox
+
+WebUiBox nay có nút **Cập nhật ngay** trong trang Cập nhật: khi phát hiện bản mới, người dùng nhập **Access Key** của Root Backend, kết nối và xác nhận cài. Backend chỉ tải từ GitHub Releases của repo lemanhquyen20004/webuibox, kiểm tra SHA-256, giải nén các file đã cho phép, sao lưu giao diện cũ rồi thay nguyên thư mục WebUiBox. **Không tự chạy khi mới mở trang và không thay đổi config.yaml, node, iptables hoặc Box.**
+
+**Cần cài thủ công một lần từ v0.0.3:** bản v0.0.3 chưa có API cập nhật một chạm, nên không thể tự nâng cấp lên v0.0.4 chỉ bằng nút ở bản cũ.
+
+1. Tải ZIP v0.0.4 tại GitHub Releases, sao lưu /data/adb/box/clash/webuibox, giải nén rồi chép đè file vào /data/adb/box/clash/webuibox. Đặc biệt phải có file updater-ui.js và binary ARM64 hotspot/webuibox-hotspot-arm64 mới.
+2. Nếu chưa kích hoạt WebUiBox Root Backend: chạy scripts/enable-hotspot.sh bằng quyền root, hoặc cấu hình service.d như hướng dẫn phần Hotspot Manager. Dịch vụ chỉ nghe ở 127.0.0.1:9097; **không tự bật hotspot**. Nếu backend đã chạy bản cũ, khởi động lại máy để nạp binary mới.
+3. Dùng MT Manager root đọc key riêng /data/adb/webuibox-private/hotspot/access.key (không chia sẻ ra ngoài). Mở http://127.0.0.1:9090/ui/#updates, nhập key và nhấn **Kết nối Root Backend**.
+4. Từ các bản sau (v0.0.5 trở lên), khi mục Cập nhật phát hiện phiên bản mới thì nhấn **Cập nhật ngay**, xác nhận. Chờ xác minh, sao lưu và cài; WebUI sẽ tải lại sau khi hoàn tất. Nếu binary backend thay đổi, reboot để nạp binary mới.
+
+**An toàn:** API cập nhật root buộc có key bí mật, chấp nhận Origin localhost của Mihomo, và chỉ cho tải repo cố định. Đây là kiểm tra checksum từ cùng chủ sở hữu repo, **không phải chữ ký độc lập**, vì vậy cần bảo vệ tài khoản GitHub. Bản cũ được lưu theo thư mục /data/adb/box/clash/webuibox.backup-<timestamp> để khôi phục thủ công nếu cần. Không đưa cổng 9097 lên Cloudflare hoặc LAN. Kiểm thử CI không thay thế thử nghiệm thực tế trên Redmi Note 8T.
