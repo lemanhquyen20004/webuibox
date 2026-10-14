@@ -37,7 +37,7 @@ actual="$(sha256sum "$TMP/$FILE" | awk '{print $1}')"
 [ -n "$expected" ] && [ "$expected" = "$actual" ] || { echo "SHA-256 mismatch";exit 1; }
 mkdir -p "$TMP/extracted"
 unzip -q "$TMP/$FILE" -d "$TMP/extracted"
-for f in index.html app.js styles.css update.json bridge/box-status.sh scripts/install.sh; do
+for f in index.html app.js hotspot.js styles.css update.json bridge/box-status.sh scripts/install.sh scripts/enable-hotspot.sh hotspot/webuibox-hotspot-arm64; do
   [ -f "$TMP/extracted/$f" ] || { echo "Incomplete release: $f";exit 1; }
 done
 [ "$(get_version "$TMP/extracted/update.json")" = "$version" ] || { echo "Version mismatch";exit 1; }

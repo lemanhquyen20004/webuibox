@@ -1,9 +1,9 @@
 {
   "name": "WebUiBox",
-  "version": "0.0.2",
-  "release_url": "https://github.com/lemanhquyen20004/webuibox/releases/tag/v0.0.2",
+  "version": "0.0.3",
+  "release_url": "https://github.com/lemanhquyen20004/webuibox/releases/tag/v0.0.3",
   "notes": {
-    "vi": "Thiết kế lại Dark Neon desktop/mobile theo ảnh đã duyệt, biểu đồ tròn theo kết nối, icon SVG, đo CPU/RAM thật và sửa bridge bin_name vào đường dẫn Mihomo.",
-    "en": "Redesigned desktop/mobile Dark Neon UI, live active-traffic donut, SVG icons, real Android CPU/RAM and fixed bin_name bridge path."
+    "vi": "Thêm Hotspot Manager (Android root Beta): xem thiết bị IPv4 qua ARP, chặn IP và giới hạn dữ liệu theo bộ đếm iptables; thử bật/tắt trên Android 11 khi cho phép riêng.",
+    "en": "Opt-in root Hotspot Manager beta: ARP client list, IPv4 quota/block rules and explicitly gated Android 11 hotspot controls."
   }
 }

@@ -15,15 +15,27 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+          cache: false
       - name: Test
-        run: npm test
+        run: |
+          npm test
+          go test ./hotspot
+      - name: Compile ARM64 root helper
+        shell: bash
+        run: |
+          CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -trimpath -ldflags="-s -w" -o hotspot/webuibox-hotspot-arm64 ./hotspot
+          test -s hotspot/webuibox-hotspot-arm64
       - name: Package
         shell: bash
         run: |
           set -euo pipefail
           V="$(node -p "require('./package.json').version")"
           FILE="webuibox-v$V.zip"
-          zip -q -r "$FILE" index.html styles.css app.js update.json bridge scripts LICENSE README.md README_vi.md package.json
+          zip -q -r "$FILE" index.html styles.css app.js hotspot.js update.json bridge scripts hotspot/webuibox-hotspot-arm64 LICENSE README.md README_vi.md package.json
           sha256sum "$FILE" > "$FILE.sha256"
           echo "FILE=$FILE" >> "$GITHUB_ENV"
           echo "V=$V" >> "$GITHUB_ENV"
@@ -51,4 +63,4 @@ jobs:
           gh release create "$TAG" "$FILE" "$FILE.sha256" \
             --target "$GITHUB_SHA" \
             --title "WebUiBox $TAG" \
-            --notes "WebUiBox $TAG: Bilingual Dark Neon dashboard for Mihomo, Box bin_name detection, and SHA-256 checked update package."
+            --notes "WebUiBox $TAG: Bilingual Dark Neon dashboard and opt-in Hotspot Manager beta. On-device MIUI toggle/quota compatibility is not guaranteed."

@@ -1,8 +1,8 @@
 {
   "name": "webuibox",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "private": true,
-  "description": "Bilingual screenshot-matched Dark Neon WebUI for Mihomo with Android root bridge",
+  "description": "WebUiBox Mihomo Dark Neon + opt-in rooted hotspot manager beta",
   "scripts": {
     "test": "node --test tests/*.test.cjs"
   },

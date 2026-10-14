@@ -7,10 +7,10 @@ const path=require('node:path');
 const read=name=>fs.readFileSync(path.join(__dirname,'..',name),'utf8');
 test('published package and UI versions match',()=>{
   const pkg=JSON.parse(read('package.json')),manifest=JSON.parse(read('update.json'));
-  assert.equal(pkg.version,'0.0.2');
+  assert.equal(pkg.version,'0.0.3');
   assert.equal(pkg.version,manifest.version);
-  assert.match(read('app.js'),/const VERSION = "0.0.2"/);
-  assert.match(read('index.html'),/WebUiBox • v0.0.2/);
+  assert.match(read('app.js'),/const VERSION = "0.0.3"/);
+  assert.match(read('index.html'),/WebUiBox • v0.0.3/);
 });
 test('all referenced DOM ids exist and are unique',()=>{
   const app=read('app.js'),html=read('index.html');
@@ -30,6 +30,16 @@ test('real system metrics are from proc and no fake values in live status',()=>{
 });
 test('scripts validate as POSIX shell syntax',()=>{
   for(const f of ['bridge/box-status.sh','scripts/install.sh','scripts/update.sh'])cp.execFileSync('sh',['-n',path.join(__dirname,'..',f)]);
+});
+test('hotspot uses authenticated localhost API and private key outside web root',()=>{
+  const go=read('hotspot/main.go');
+  assert.match(go,/127\.0\.0\.1:9097/);
+  assert.match(go,/webuibox-private\/hotspot/);
+  assert.match(go,/X-WebUiBox-Key/);
+  assert.match(go,/allow-android11-binder/);
+  assert.match(go,/iptables/);
+  assert.match(read('index.html'),/id="page-hotspot"/);
+  new vm.Script(read('hotspot.js'));
 });
 test('install location is within Mihomo allowed directory',()=>{
   const install=read('scripts/install.sh'),bridge=read('bridge/box-status.sh');
