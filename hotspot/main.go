@@ -92,8 +92,7 @@ func findHotspotInterface()string{
 func peers(iface string)[]Client{
  if iface=="" {return []Client{}}
  raw,err:=os.ReadFile("/proc/net/arp");if err!=nil{return []Client{}}
- rows:=strings.Split(string(raw),"
-")
+ rows:=strings.Split(string(raw),"\n")
  seen:=map[string]bool{}
  out:=[]Client{}
  for _,row:=range rows[1:]{
@@ -165,8 +164,7 @@ func (s *Server)apply(rule Rule)error{
 func usage(chain,ip string)uint64{
  raw,err:=iptOutput("-L",chain,"-n","-v","-x");if err!=nil{return 0}
  var bytes uint64
- for _,line:=range strings.Split(raw,"
-"){
+ for _,line:=range strings.Split(raw,"\n"){
   f:=strings.Fields(line)
   if len(f)<9 || f[2]!="RETURN" {continue}
   // iptables columns pkts bytes target prot opt in out source destination
@@ -277,8 +275,7 @@ func token()string{
  old,err:=os.ReadFile(f);if err==nil && len(strings.TrimSpace(string(old)))>=40{return strings.TrimSpace(string(old))}
  buf:=make([]byte,32);if _,err=rand.Read(buf);err!=nil{log.Fatal(err)}
  key:=hex.EncodeToString(buf)
- if err=os.WriteFile(f,[]byte(key+"
-"),0600);err!=nil{log.Fatal(err)}
+ if err=os.WriteFile(f,[]byte(key+"\n"),0600);err!=nil{log.Fatal(err)}
  return key
 }
 func main(){
