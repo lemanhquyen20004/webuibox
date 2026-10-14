@@ -276,3 +276,10 @@ button:active{transform:scale(.98)}
 .hs-client-actions{gap:6px}
 .hs-client-actions button{padding:6px 8px}
 }
+
+/* Hotspot gets its own sixth mobile tab without wrapping to a second row. */
+@media(max-width:900px){
+ #mobile-nav{grid-template-columns:repeat(6,minmax(0,1fr))}
+ #mobile-nav button{min-width:0}
+ #mobile-nav button span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9px}
+}
