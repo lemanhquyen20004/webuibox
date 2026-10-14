@@ -32,7 +32,7 @@ var safeVersion=regexp.MustCompile("^[0-9]+\\.[0-9]+\\.[0-9]+$")
 var safeSha=regexp.MustCompile("^[0-9a-f]{64}$")
 var updateClient=&http.Client{Timeout:90*time.Second}
 var updateFiles=[]string{
- "index.html", "app.js", "styles.css", "hotspot.js", "update.json",
+ "index.html", "app.js", "styles.css", "hotspot.js", "updater-ui.js", "update.json",
  "bridge/box-status.sh", "scripts/install.sh", "scripts/update.sh",
  "scripts/enable-hotspot.sh", "scripts/disable-hotspot.sh",
  "hotspot/webuibox-hotspot-arm64",

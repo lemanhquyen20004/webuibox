@@ -35,7 +35,7 @@ jobs:
           set -euo pipefail
           V="$(node -p "require('./package.json').version")"
           FILE="webuibox-v$V.zip"
-          zip -q -r "$FILE" index.html styles.css app.js hotspot.js update.json bridge scripts hotspot/webuibox-hotspot-arm64 LICENSE README.md README_vi.md package.json
+          zip -q -r "$FILE" index.html styles.css app.js hotspot.js updater-ui.js update.json bridge scripts hotspot/webuibox-hotspot-arm64 LICENSE README.md README_vi.md package.json
           sha256sum "$FILE" > "$FILE.sha256"
           echo "FILE=$FILE" >> "$GITHUB_ENV"
           echo "V=$V" >> "$GITHUB_ENV"
@@ -63,4 +63,4 @@ jobs:
           gh release create "$TAG" "$FILE" "$FILE.sha256" \
             --target "$GITHUB_SHA" \
             --title "WebUiBox $TAG" \
-            --notes "WebUiBox $TAG: Bilingual Dark Neon dashboard and opt-in Hotspot Manager beta. On-device MIUI toggle/quota compatibility is not guaranteed."
+            --notes "WebUiBox $TAG: Bilingual Dark Neon WebUI with opt-in root update workflow: checksummed GitHub releases, staged installs and backup. Hotspot manager remains beta."
