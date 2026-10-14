@@ -6,6 +6,7 @@ package main
 // from the local UI are required before starting an update.
 import (
  "archive/zip"
+ "bytes"
  "crypto/sha256"
  "encoding/hex"
  "encoding/json"
@@ -105,7 +106,7 @@ func packageFor(version string)([]byte,error){
  return payload,nil
 }
 func unpackRelease(data []byte,dir,version string)error{
- reader,err:=zip.NewReader(strings.NewReader(string(data)),int64(len(data)))
+ reader,err:=zip.NewReader(bytes.NewReader(data),int64(len(data)))
  if err!=nil{return err}
  wanted:=map[string]bool{}
  for _,f:=range updateFiles{wanted[f]=true}
@@ -113,7 +114,8 @@ func unpackRelease(data []byte,dir,version string)error{
  var total int64
  for _,f:=range reader.File{
   name:=f.Name
-  if !wanted[name] || found[name]{return fmt.Errorf("unexpected or duplicate archive entry: %s",name)}
+  if f.FileInfo().IsDir() || !wanted[name] {continue}
+  if found[name]{return fmt.Errorf("duplicate archive entry: %s",name)}
   if !f.Mode().IsRegular(){return fmt.Errorf("invalid archive entry type: %s",name)}
   if f.UncompressedSize64>16<<20{return fmt.Errorf("file oversized: %s",name)}
   total+=int64(f.UncompressedSize64)
