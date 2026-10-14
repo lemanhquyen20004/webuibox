@@ -56,66 +56,8 @@ type Server struct {
  token string
 }
 var validMAC=regexp.MustCompile(`(?i)^([0-9a-f]{2}:){5}[0-9a-f]{2}$`)
-var validIP=regexp.MustCompile(`^[0-9]{1,3}(\.[0-9]{1,3}){3}package main
-
-// WebUiBox hotspot daemon for rooted Android. Localhost ONLY.
-// Limitations: Android 11 binder methods vary across OEM builds; traffic quotas
-// count IPv4 iptables packets, and may miss IPv6 or hardware-offloaded flows.
-import (
- "crypto/rand"
- "crypto/subtle"
- "encoding/hex"
- "encoding/json"
- "errors"
- "fmt"
- "log"
- "net"
- "net/http"
- "os"
- "os/exec"
- "path/filepath"
- "regexp"
- "strconv"
- "strings"
- "sync"
- "time"
-)
-
-const (
- base = "/data/adb/box/clash/webuibox/hotspot"
- port = "127.0.0.1:9097"
- chainIn = "WUBX_IN"
- chainOut = "WUBX_OUT"
-)
-type Client struct {
- IP string `json:"ip"`
- MAC string `json:"mac"`
- Interface string `json:"interface"`
- Upload uint64 `json:"upload"`
- Download uint64 `json:"download"`
- Limit uint64 `json:"limit"`
- Blocked bool `json:"blocked"`
- QuotaReached bool `json:"quota_reached"`
-}
-type Rule struct {
- IP string `json:"ip"`
- MAC string `json:"mac"`
- Interface string `json:"interface"`
- Limit uint64 `json:"limit"`
- Blocked bool `json:"blocked"`
- QuotaReached bool `json:"quota_reached"`
-}
-type state struct {
- Rules map[string]Rule `json:"rules"`
-}
-type Server struct {
- mu sync.Mutex
- state state
- token string
-}
-var validMAC=regexp.MustCompile(`(?i)^([0-9a-f]{2}:){5}[0-9a-f]{2}$`)
-var validIP=regexp.MustCompile()
-var activeIface=regexp.MustCompile(`^(ap[0-9]*|swlan[0-9]*|wlan[1-9][0-9]*|softap[0-9]*)$`)
+var validIP=regexp.MustCompile("^[0-9]{1,3}(\\.[0-9]{1,3}){3}$")
+var activeIface=regexp.MustCompile("^(ap[0-9]*|swlan[0-9]*|wlan[1-9][0-9]*|softap[0-9]*)$")
 func cmd(name string,args ...string)(string,error){
  c:=exec.Command(name,args...);c.Env=[]string{"PATH=/system/bin:/system/xbin:/vendor/bin:/data/adb/magisk"}
  output,err:=c.CombinedOutput()
