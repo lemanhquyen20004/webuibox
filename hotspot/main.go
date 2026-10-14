@@ -24,7 +24,7 @@ import (
 )
 
 const (
- base = "/data/adb/box/clash/webuibox/hotspot"
+ base = "/data/adb/webuibox-private/hotspot"
  port = "127.0.0.1:9097"
  chainIn = "WUBX_IN"
  chainOut = "WUBX_OUT"
