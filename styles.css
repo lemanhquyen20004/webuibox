@@ -233,3 +233,46 @@ button:active{transform:scale(.98)}
  .mobile-brand .cube svg{height:34px;width:34px}
  .mobile-nav b svg{width:22px;height:22px}
 }
+
+
+/* WebUiBox v0.0.3 · Hotspot Manager */
+.hs-warning{border:1px solid #a56b28;background:linear-gradient(120deg,#261d22,#122038);margin-bottom:14px;padding:15px}
+.hs-warning strong{color:#ffcc7d;font-size:14px}
+.hs-warning p{color:#d4bd9f;font-size:12px;margin-top:5px}
+.hs-panels{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.hs-overview{background:linear-gradient(145deg,#102c32,#091728)}
+.hs-big{font-size:23px;font-weight:760;color:#32efaa;line-height:1.2;margin:15px 0 8px}
+.hs-actions{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}
+.hs-input{display:block;width:100%;padding:11px 12px;border:1px solid #395777;border-radius:10px;outline:none;color:#f4f8ff;background:#071326;margin:8px 0}
+.hs-input:focus{border-color:#00a9ee;box-shadow:0 0 0 2px #0488df33}
+.hs-label{display:block;font-size:12px;color:#b9cce4;margin-top:16px}
+.hs-message{margin-top:13px;line-height:1.5;color:#8dcfb9}
+.hs-device-panel{margin-bottom:14px}
+.hs-devices{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:16px}
+.hs-client{padding:14px;background:linear-gradient(135deg,#0a2036,#0a1830);border:1px solid #254e71;border-radius:12px;min-width:0}
+.hs-client-main{display:flex;align-items:center;gap:10px}
+.hs-client-main>div{min-width:0;flex:1}
+.hs-client-main strong{font-size:14px}
+.hs-client-main small{font-size:11px;display:block;color:#88b0cf;overflow:hidden;text-overflow:ellipsis}
+.hs-device-symbol{width:33px;height:33px;border:1px solid #3186b8;background:#0a3451;border-radius:10px;display:grid;place-items:center;font-size:18px;color:#28cfff;flex-shrink:0}
+.hs-traffic{padding:12px 2px;font-size:12px;color:#bfd4e8}
+.hs-traffic strong{color:white}
+.hs-traffic small{display:block;color:#a0bbd6;margin-top:4px}
+.hs-client-actions{display:flex;align-items:flex-end;flex-wrap:wrap;gap:8px}
+.hs-client-actions label{font-size:11px;color:#adc5df;flex:1;min-width:96px}
+.hs-client-actions input{height:35px;display:block;width:100%;margin-top:4px;padding:0 8px;color:#e6f5ff;border:1px solid #345578;border-radius:8px;background:#051527}
+.hs-client-actions button{height:35px;font-size:11px}
+.badge-danger,.badge-good{display:inline-flex;border-radius:7px;padding:4px 6px;font-size:10px;white-space:nowrap;background:#541f34;color:#ffb7c6;border:1px solid #ae3d57}
+.badge-good{background:#0b382a;border-color:#167451;color:#6bfec6}
+.hs-notes{background:linear-gradient(130deg,#181c37,#0b1b30)}
+.hs-notes p{margin-top:10px;font-size:12px}
+@media(max-width:800px){
+.hs-panels{grid-template-columns:1fr}
+.hs-devices{grid-template-columns:1fr}
+}
+@media(max-width:640px){
+.hs-warning{padding:12px}
+.hs-big{font-size:19px}
+.hs-client-actions{gap:6px}
+.hs-client-actions button{padding:6px 8px}
+}
