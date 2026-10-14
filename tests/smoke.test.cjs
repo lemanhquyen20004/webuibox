@@ -29,7 +29,7 @@ test('real system metrics are from proc and no fake values in live status',()=>{
   assert.ok(!b.includes('source "$SETTINGS"'));
 });
 test('scripts validate as POSIX shell syntax',()=>{
-  for(const f of ['bridge/box-status.sh','scripts/install.sh','scripts/update.sh'])cp.execFileSync('sh',['-n',path.join(__dirname,'..',f)]);
+  for(const f of ['bridge/box-status.sh','scripts/install.sh','scripts/update.sh','scripts/enable-hotspot.sh','scripts/disable-hotspot.sh'])cp.execFileSync('sh',['-n',path.join(__dirname,'..',f)]);
 });
 test('hotspot uses authenticated localhost API and private key outside web root',()=>{
   const go=read('hotspot/main.go');
