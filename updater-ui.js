@@ -1,0 +1,117 @@
+/* WebUiBox v0.0.4 — authenticated, user-confirmed one-tap UI update.
+   Requires optional root backend (127.0.0.1:9097), enabled separately.
+   No arbitrary commands and no automatic root action on page load. */
+(() => {
+"use strict";
+const $=s=>document.querySelector(s);
+const keyName="webuibox.hotspot.sessionKey";
+const remote="https://raw.githubusercontent.com/lemanhquyen20004/webuibox/main/update.json";
+const localBackend="http://127.0.0.1:9097/api/v1/update";
+const t=(vi,en)=>document.documentElement.lang==="en"?en:vi;
+let sessionKey=sessionStorage.getItem(keyName)||"";
+let newest="";
+let busy=false;
+let stateTimer=null;
+function currentVersion(){return ($("[data-version]")?.textContent||"0.0.4").replace(/^v/,"").trim();}
+function parts(v){return /^\d+\.\d+\.\d+$/.test(v)?v.split(".").map(Number):[0,0,0];}
+function newer(a,b){let x=parts(a),y=parts(b);for(let i=0;i<3;i++)if(x[i]!==y[i])return x[i]>y[i];return false;}
+function text(msg,error=false){const n=$("#oneclick-status");n.textContent=msg;n.style.color=error?"#ffa4b8":"#b0e9df";}
+async function api(path,method="GET",data=null){
+ if(!sessionKey)throw new Error(t("Hãy nhập Access Key của WebUiBox Root Backend.","Enter the root backend access key."));
+ const controller=new AbortController(),stop=setTimeout(()=>controller.abort(),12000);
+ try{
+  const r=await fetch(localBackend+path,{method,cache:"no-store",signal:controller.signal,
+   headers:{"X-WebUiBox-Key":sessionKey,...(data?{"Content-Type":"application/json"}:{})},
+   ...(data?{body:JSON.stringify(data)}:{})
+  });
+  if(!r.ok)throw new Error("HTTP "+r.status+": "+(await r.text()).slice(0,120));
+  return await r.json();
+ }finally{clearTimeout(stop);}
+}
+async function checkLatest(){
+ try{
+  const r=await fetch(remote+"?ts="+Date.now(),{cache:"no-store"});
+  if(!r.ok)throw Error("GitHub HTTP "+r.status);
+  const j=await r.json();
+  if(!/^\d+\.\d+\.\d+$/.test(j.version))throw Error("Invalid release version");
+  newest=j.version;
+  return newer(newest,currentVersion());
+ }catch(err){text(t("Không kiểm tra được GitHub: ","GitHub check failed: ")+err.message,true);return false;}
+}
+async function connect(){
+ sessionKey=$("#oneclick-key").value.trim();
+ if(sessionKey)sessionStorage.setItem(keyName,sessionKey);
+ else sessionStorage.removeItem(keyName);
+ try{
+  const info=await api("/status");
+  $("#oneclick-install").disabled=!(newest&&newer(newest,info.installed))||info.update.running;
+  text(t("Đã kết nối Root Backend. Phiên bản cài: ","Root backend connected. Installed: ")+info.installed);
+  if(info.update.running)watch();
+ }catch(err){
+  $("#oneclick-install").disabled=true;
+  text(t("Chưa kết nối được Root Backend: ","Cannot connect root backend: ")+err.message,true);
+ }
+}
+async function watch(){
+ if(stateTimer)clearInterval(stateTimer);
+ const poll=async()=>{
+  try{
+   const res=await api("/status");
+   const info=res.update||{};
+   if(info.running){
+    busy=true;
+    text(t("Đang xử lý: ","Processing: ")+(info.stage||"updating")+" · v"+(info.version||""));
+    return;
+   }
+   if(info.complete){
+    busy=false;
+    clearInterval(stateTimer);stateTimer=null;
+    $("#oneclick-install").disabled=true;
+    text(t("Đã cài thành công v","Installed v")+info.version+t(". Đang tải lại WebUI... (khởi động lại máy khi cần cập nhật backend).",". Reloading the UI... (reboot to activate a changed backend)."));
+    setTimeout(()=>{window.location.href=location.pathname+"?installed="+encodeURIComponent(info.version)+"#updates";},1700);
+    return;
+   }
+   if(info.error){
+    busy=false;clearInterval(stateTimer);stateTimer=null;
+    $("#oneclick-install").disabled=false;
+    text(t("Cập nhật thất bại; bản cũ vẫn được giữ lại: ","Update failed; old UI retained: ")+info.error,true);
+   }
+  }catch(err){
+   text(t("Không lấy được tiến trình cập nhật: ","Cannot read update progress: ")+err.message,true);
+  }
+ };
+ await poll();
+ if(!stateTimer)stateTimer=setInterval(poll,2300);
+}
+async function begin(){
+ if(busy)return;
+ try{
+  const hasNew=await checkLatest();
+  if(!hasNew){text(t("Chưa có phiên bản mới hơn.","No newer version available."));return;}
+  const msg=t("Cài WebUiBox v"+newest+" từ GitHub? Giao diện cũ sẽ được sao lưu. Không thay đổi config VPN/iptables.","Install WebUiBox v"+newest+" from GitHub? Existing UI will be backed up; VPN config and iptables are unchanged.");
+  if(!window.confirm(msg))return;
+  $("#oneclick-install").disabled=true;
+  await api("/install","POST",{version:newest});
+  busy=true;text(t("Đang tải và xác minh ZIP...","Downloading and verifying release ZIP..."));
+  await watch();
+ }catch(err){
+  busy=false;$("#oneclick-install").disabled=false;
+  text(t("Không thể cập nhật: ","Update failed to start: ")+err.message,true);
+ }
+}
+async function start(){
+ const input=$("#oneclick-key");
+ if(!input)return;
+ input.value=sessionKey;
+ $("#oneclick-connect").onclick=connect;
+ $("#oneclick-install").onclick=begin;
+ $("#oneclick-refresh").onclick=async()=>{
+  const hasNew=await checkLatest();
+  text(hasNew?t("Có phiên bản mới: v","New release: v")+newest:t("Không có phiên bản mới.","No newer version found."));
+  if(sessionKey)await connect();
+ };
+ await checkLatest();
+ if(sessionKey)connect();
+}
+document.addEventListener("DOMContentLoaded",start);
+})();
