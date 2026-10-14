@@ -14,7 +14,7 @@ trap 'rm -rf "$STAGE"' EXIT
 mkdir -p "$STAGE/bridge" "$STAGE/scripts" "$STAGE/hotspot"
 for file in index.html app.js hotspot.js styles.css update.json; do cp "$SOURCE/$file" "$STAGE/$file"; done
 cp "$SOURCE/bridge/box-status.sh" "$STAGE/bridge/box-status.sh"
-for file in install.sh update.sh enable-hotspot.sh; do cp "$SOURCE/scripts/$file" "$STAGE/scripts/$file"; done
+for file in install.sh update.sh enable-hotspot.sh disable-hotspot.sh; do cp "$SOURCE/scripts/$file" "$STAGE/scripts/$file"; done
 cp "$SOURCE/hotspot/webuibox-hotspot-arm64" "$STAGE/hotspot/webuibox-hotspot-arm64"
 chmod 755 "$STAGE/hotspot/webuibox-hotspot-arm64" "$STAGE/bridge/box-status.sh" "$STAGE/scripts/"*.sh
 if [ -d "$DEST" ]; then rm -rf "$BACKUP"; mv "$DEST" "$BACKUP"; fi
