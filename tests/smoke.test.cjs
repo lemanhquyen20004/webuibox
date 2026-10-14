@@ -7,10 +7,10 @@ const path=require('node:path');
 const read=name=>fs.readFileSync(path.join(__dirname,'..',name),'utf8');
 test('published package and UI versions match',()=>{
   const pkg=JSON.parse(read('package.json')),manifest=JSON.parse(read('update.json'));
-  assert.equal(pkg.version,'0.0.3');
+  assert.equal(pkg.version,'0.0.4');
   assert.equal(pkg.version,manifest.version);
-  assert.match(read('app.js'),/const VERSION = "0.0.3"/);
-  assert.match(read('index.html'),/WebUiBox • v0.0.3/);
+  assert.match(read('app.js'),/const VERSION = "0.0.4"/);
+  assert.match(read('index.html'),/WebUiBox • v0.0.4/);
 });
 test('all referenced DOM ids exist and are unique',()=>{
   const app=read('app.js'),html=read('index.html');
@@ -40,6 +40,11 @@ test('hotspot uses authenticated localhost API and private key outside web root'
   assert.match(go,/iptables/);
   assert.match(read('index.html'),/id="page-hotspot"/);
   new vm.Script(read('hotspot.js'));
+  new vm.Script(read('updater-ui.js'));
+  assert.match(read('hotspot/updater.go'),/releaseBase/);
+  assert.match(read('hotspot/updater.go'),/sha256.Sum256/);
+  assert.match(read('hotspot/updater.go'),/os.Rename/);
+  assert.match(read('index.html'),/oneclick-install/);
 });
 test('install location is within Mihomo allowed directory',()=>{
   const install=read('scripts/install.sh'),bridge=read('bridge/box-status.sh');

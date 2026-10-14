@@ -54,6 +54,7 @@ type Server struct {
  mu sync.Mutex
  state state
  token string
+ update updateResult
 }
 var validMAC=regexp.MustCompile(`(?i)^([0-9a-f]{2}:){5}[0-9a-f]{2}$`)
 var validIP=regexp.MustCompile("^[0-9]{1,3}(\\.[0-9]{1,3}){3}$")
@@ -302,7 +303,7 @@ func main(){
    s.mu.Unlock()
   }
  }()
- mux:=http.NewServeMux();mux.HandleFunc("/api/v1/",s.handler)
+ mux:=http.NewServeMux();mux.HandleFunc("/api/v1/update/",s.updaterHandler);mux.HandleFunc("/api/v1/",s.handler)
  server:=&http.Server{Addr:port,Handler:mux,ReadHeaderTimeout:5*time.Second,ReadTimeout:10*time.Second,WriteTimeout:12*time.Second,IdleTimeout:15*time.Second}
  log.Printf("WebUiBox hotspot beta backend on %s",port)
  log.Fatal(server.ListenAndServe())

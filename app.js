@@ -1,8 +1,8 @@
-/* WebUiBox v0.0.3 — independently implemented UI using the Mihomo REST/WebSocket API.
+/* WebUiBox v0.0.4 — independently implemented UI using the Mihomo REST/WebSocket API.
    Demo data is clearly labeled; live mode never invents traffic or CPU metrics. */
 (function () {
   "use strict";
-  const VERSION = "0.0.3";
+  const VERSION = "0.0.4";
   const REPO = "https://github.com/lemanhquyen20004/webuibox";
   const MANIFEST = "https://raw.githubusercontent.com/lemanhquyen20004/webuibox/main/update.json";
   const $ = (selector) => document.querySelector(selector);
@@ -27,10 +27,10 @@
   };
 
   Object.assign(tr.vi, {
-    hotspot:"Phát Wi-Fi",tools:"Công cụ",about:"Giới thiệu",today:"Hôm nay",device:"Thiết bị",cpuFoot:"CPU toàn máy · cần bridge root",boxStatus:"Trạng thái Box",latency:"Độ trễ",latencyFoot:"Độ trễ node đã chọn",current:"Hiện tại",trafficDistribution:"Phân bố lưu lượng",activeOnly:"Các kết nối hiện tại",activeOnlyShort:"Đang hoạt động",shareNote:"Ước tính theo lưu lượng các kết nối đang hoạt động, không phải cả ngày",toolsDesc:"Công cụ hỗ trợ kiểm tra mạng qua Mihomo API.",dnsTools:"DNS và Cache",dnsToolsHelp:"Các thao tác cache nằm trong Cài đặt và chỉ dùng API Mihomo.",openSettings:"Mở cài đặt",coreTools:"Thông tin core",coreToolsHelp:"Lõi đang chọn trong settings.ini của Box.",aboutDesc:"WebUI Dark Neon cho Box for Root, hỗ trợ Mihomo trên desktop và Android."
+    oneClickTitle:"Cập nhật WebUiBox một chạm",oneClickHelp:"Cần WebUiBox Root Backend đã bật và Access Key. Khi nâng cấp từ v0.0.3 phải cài v0.0.4 thủ công một lần và khởi động lại backend.",oneClickConnect:"Kết nối Root Backend",oneClickCheck:"Kiểm tra phiên bản",oneClickInstall:"Cập nhật ngay",hotspot:"Phát Wi-Fi",tools:"Công cụ",about:"Giới thiệu",today:"Hôm nay",device:"Thiết bị",cpuFoot:"CPU toàn máy · cần bridge root",boxStatus:"Trạng thái Box",latency:"Độ trễ",latencyFoot:"Độ trễ node đã chọn",current:"Hiện tại",trafficDistribution:"Phân bố lưu lượng",activeOnly:"Các kết nối hiện tại",activeOnlyShort:"Đang hoạt động",shareNote:"Ước tính theo lưu lượng các kết nối đang hoạt động, không phải cả ngày",toolsDesc:"Công cụ hỗ trợ kiểm tra mạng qua Mihomo API.",dnsTools:"DNS và Cache",dnsToolsHelp:"Các thao tác cache nằm trong Cài đặt và chỉ dùng API Mihomo.",openSettings:"Mở cài đặt",coreTools:"Thông tin core",coreToolsHelp:"Lõi đang chọn trong settings.ini của Box.",aboutDesc:"WebUI Dark Neon cho Box for Root, hỗ trợ Mihomo trên desktop và Android."
   });
   Object.assign(tr.en, {
-    hotspot:"Hotspot",tools:"Tools",about:"About",today:"Today",device:"Device",cpuFoot:"Phone CPU · root bridge needed",boxStatus:"Box status",latency:"Latency",latencyFoot:"Selected node latency",current:"Selected",trafficDistribution:"Traffic distribution",activeOnly:"Current connections",activeOnlyShort:"Active",shareNote:"Estimated from active connection bytes, not daily totals",toolsDesc:"Networking tools through the Mihomo API.",dnsTools:"DNS and Cache",dnsToolsHelp:"Cache maintenance is available in Settings through Mihomo API.",openSettings:"Open Settings",coreTools:"Core information",coreToolsHelp:"Core selected in Box settings.ini.",aboutDesc:"Dark Neon WebUI for Box for Root with Mihomo support on desktop and Android."
+    oneClickTitle:"One-tap WebUiBox update",oneClickHelp:"Requires enabled WebUiBox Root Backend and its key. From v0.0.3, install v0.0.4 once manually and restart the backend.",oneClickConnect:"Connect Root Backend",oneClickCheck:"Check releases",oneClickInstall:"Install update",hotspot:"Hotspot",tools:"Tools",about:"About",today:"Today",device:"Device",cpuFoot:"Phone CPU · root bridge needed",boxStatus:"Box status",latency:"Latency",latencyFoot:"Selected node latency",current:"Selected",trafficDistribution:"Traffic distribution",activeOnly:"Current connections",activeOnlyShort:"Active",shareNote:"Estimated from active connection bytes, not daily totals",toolsDesc:"Networking tools through the Mihomo API.",dnsTools:"DNS and Cache",dnsToolsHelp:"Cache maintenance is available in Settings through Mihomo API.",openSettings:"Open Settings",coreTools:"Core information",coreToolsHelp:"Core selected in Box settings.ini.",aboutDesc:"Dark Neon WebUI for Box for Root with Mihomo support on desktop and Android."
   });
   let lang = localStorage.getItem("webuibox.lang") === "en" ? "en" : "vi";
   let demo = localStorage.getItem("webuibox.demo") === "true";
@@ -223,7 +223,7 @@
     ];
     rules=[{type:"DOMAIN-SUFFIX",payload:"google.com",proxy:"PROXY"},{type:"DOMAIN-KEYWORD",payload:"game",proxy:"PROXY"},{type:"GEOIP",payload:"VN",proxy:"DIRECT"},{type:"MATCH",payload:"",proxy:"PROXY"}];
     config={mode:"rule"};logs=[];
-    pushLog({type:"info",payload:"WebUiBox v0.0.3 · DEMO MODE"});
+    pushLog({type:"info",payload:"WebUiBox v0.0.4 · DEMO MODE"});
     pushLog({type:"info",payload:"Sample Mihomo metrics — no live data"});
     bridgeBin="mihomo";$("#core-name").textContent="mihomo";$("#core-version").textContent="v1.19.31 (demo)";
     $("#core-source").textContent="DEMO / bin_name";$("#settings-bin").textContent="mihomo (demo)";

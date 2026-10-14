@@ -1,9 +1,9 @@
 {
   "name": "WebUiBox",
-  "version": "0.0.3",
-  "release_url": "https://github.com/lemanhquyen20004/webuibox/releases/tag/v0.0.3",
+  "version": "0.0.4",
+  "release_url": "https://github.com/lemanhquyen20004/webuibox/releases/tag/v0.0.4",
   "notes": {
-    "vi": "Thêm Hotspot Manager (Android root Beta): xem thiết bị IPv4 qua ARP, chặn IP và giới hạn dữ liệu theo bộ đếm iptables; thử bật/tắt trên Android 11 khi cho phép riêng.",
-    "en": "Opt-in root Hotspot Manager beta: ARP client list, IPv4 quota/block rules and explicitly gated Android 11 hotspot controls."
+    "vi": "Bổ sung cập nhật một chạm ngay WebUiBox: tự tải ZIP từ GitHub, xác minh SHA-256, sao lưu và cài. Cần Root Backend; nâng cấp thủ công một lần từ v0.0.3.",
+    "en": "Opt-in one-tap update in WebUiBox: GitHub download, SHA-256 check, backup and install. Requires Root Backend and one manual upgrade from v0.0.3."
   }
 }

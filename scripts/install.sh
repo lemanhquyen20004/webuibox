@@ -1,5 +1,5 @@
 #!/system/bin/sh
-# WebUiBox v0.0.3. Installs under Mihomo SAFE_PATHS instead of /data/adb/box/webuibox.
+# WebUiBox v0.0.4. Installs under Mihomo SAFE_PATHS instead of /data/adb/box/webuibox.
 set -eu
 [ "$(id -u)" = 0 ] || { echo "Run as root"; exit 1; }
 SOURCE="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
@@ -12,7 +12,7 @@ STAGE="$BOX_DIR/clash/.webuibox-stage-$$"
 BACKUP="$BOX_DIR/clash/webuibox.backup"
 trap 'rm -rf "$STAGE"' EXIT
 mkdir -p "$STAGE/bridge" "$STAGE/scripts" "$STAGE/hotspot"
-for file in index.html app.js hotspot.js styles.css update.json; do cp "$SOURCE/$file" "$STAGE/$file"; done
+for file in index.html app.js hotspot.js updater-ui.js styles.css update.json; do cp "$SOURCE/$file" "$STAGE/$file"; done
 cp "$SOURCE/bridge/box-status.sh" "$STAGE/bridge/box-status.sh"
 for file in install.sh update.sh enable-hotspot.sh disable-hotspot.sh; do cp "$SOURCE/scripts/$file" "$STAGE/scripts/$file"; done
 cp "$SOURCE/hotspot/webuibox-hotspot-arm64" "$STAGE/hotspot/webuibox-hotspot-arm64"
