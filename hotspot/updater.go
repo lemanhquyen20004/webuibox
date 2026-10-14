@@ -36,6 +36,7 @@ var updateFiles=[]string{
  "bridge/box-status.sh", "scripts/install.sh", "scripts/update.sh",
  "scripts/enable-hotspot.sh", "scripts/disable-hotspot.sh",
  "hotspot/webuibox-hotspot-arm64",
+ "LICENSE", "README.md", "README_vi.md", "package.json",
 }
 
 type releaseManifest struct {Version string `json:"version"`}
