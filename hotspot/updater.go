@@ -6,6 +6,9 @@ package main
 // from the local UI are required before starting an update.
 import (
  "archive/zip"
+ "context"
+ "log"
+ "os/exec"
  "bytes"
  "crypto/sha256"
  "encoding/hex"
@@ -156,15 +159,42 @@ func installRelease(next string)(string,error){
  if err!=nil{return "",err}
  defer os.RemoveAll(stage)
  if err=unpackRelease(bytes,stage,next);err!=nil{return "",err}
+ // box-status.json is runtime device data, never part of the release package.
+ // Preserve a validated snapshot during the brief atomic directory swap.
+ statusPath:=filepath.Join(uiRoot,"box-status.json")
+ if stat,statErr:=os.Lstat(statusPath);statErr==nil && stat.Mode().IsRegular() && stat.Size()<8192{
+  if state,readErr:=os.ReadFile(statusPath);readErr==nil && json.Valid(state){
+   _=os.WriteFile(filepath.Join(stage,"box-status.json"),state,0644)
+  }
+ }
  backup:=filepath.Join(uiParent,fmt.Sprintf("webuibox.backup-%d",time.Now().Unix()))
  if err=os.Rename(uiRoot,backup);err!=nil{return "",err}
  if err=os.Rename(stage,uiRoot);err!=nil{
   if revert:=os.Rename(backup,uiRoot);revert!=nil{return backup,fmt.Errorf("install failed; restore from %s: %w",backup,revert)}
   return "",fmt.Errorf("install failed and old UI restored: %w",err)
  }
- // Update root files only. Do not stop the running daemon; its next reboot
- // will load the new ARM64 binary from the new directory.
+ // Restore the independent Box metadata bridge whenever the UI is upgraded.
+ // Its service.d entry survives reboots; --once regenerates the JSON now.
+ refreshBoxBridge()
+ // Root backend keeps the previously loaded binary until the next reboot.
  return backup,nil
+}
+func refreshBoxBridge(){
+ script:=filepath.Join(uiRoot,"bridge/box-status.sh")
+ launcher:="#!/system/bin/sh\n/system/bin/sh /data/adb/box/clash/webuibox/bridge/box-status.sh >/dev/null 2>&1 &\n"
+ if err:=os.MkdirAll("/data/adb/service.d",0755);err==nil{
+  if err=os.WriteFile("/data/adb/service.d/webuibox-status.sh",[]byte(launcher),0755);err!=nil{
+   log.Printf("WebUiBox: cannot repair service.d entry: %v",err)
+  }
+ }
+ ctx,cancel:=context.WithTimeout(context.Background(),8*time.Second)
+ defer cancel()
+ out,err:=exec.CommandContext(ctx,"/system/bin/sh",script,"--once").CombinedOutput()
+ if err!=nil{log.Printf("WebUiBox: status regeneration failed: %v (%s)",err,strings.TrimSpace(string(out)))}
+ // A detached script exits immediately when a bridge process is already alive.
+ cmd:=exec.Command("/system/bin/sh",script)
+ cmd.Stdin=nil;cmd.Stdout=io.Discard;cmd.Stderr=io.Discard
+ if err=cmd.Start();err!=nil{log.Printf("WebUiBox: cannot start bridge: %v",err)}else{_ = cmd.Process.Release()}
 }
 func (s *Server)updateStage(stage string){
  s.mu.Lock();s.update.Stage=stage;s.mu.Unlock()
