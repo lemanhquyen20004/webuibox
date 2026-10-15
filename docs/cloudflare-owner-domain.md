@@ -1,93 +1,84 @@
-# WebUiBox v0.0.7 — Quản lý từ xa qua Cloudflare Access
+# WebUiBox v0.0.8 — Một Cloudflare Tunnel và Magisk Root Unix socket
 
-Tên miền: https://box.lemanhquyen.io.vn
-Thiết bị: Android root đang chạy Box/Mihomo và dịch vụ WebUiBox Root Backend.
+Mục tiêu: https://box.lemanhquyen.io.vn
 
-**Rất quan trọng:** Đây là HTTP API có quyền root. Không bật route API công khai nếu chưa cấu hình Cloudflare Access. Phiên bản v0.0.7 thêm lớp xác minh chữ ký JWT RSA-SHA256, đúng issuer và audience từ Cloudflare; Root Backend còn yêu cầu X-WebUiBox-Key của điện thoại. Nếu chưa có file remote-access.json hợp lệ, API root từ xa trả HTTP 403, KHÔNG mở quyền root.
+## Kiến trúc
 
-## 1. Cloudflare Access — bảo vệ TOÀN BỘ hostname
+- Mihomo vẫn ở 127.0.0.1:9090, phục vụ WebUI, proxy, rules, logs, websocket.
+- Một cổng GATEWAY localhost: 127.0.0.1:9098 — là điểm vào duy nhất cho Tunnel, KHÔNG bind ra 0.0.0.0.
+- Gateway chuyển /api/v1/* vào Unix socket /data/adb/webuibox-private/hotspot/root-api.sock (quyền 0600), chuyển các đường dẫn khác vào Mihomo 9090.
+- Không mở cổng API root 9097. Root daemon chạy bởi Magisk service.d trên điện thoại.
+- Với truy cập từ xa, Gateway kiểm tra chữ ký Cloudflare Access JWT (RS256, đúng Team Domain/AUD). Tất cả lệnh root còn yêu cầu access.key riêng.
+- Truy cập localhost trực tiếp qua 9098 vẫn cần access.key để thực hiện lệnh root. Trình duyệt không thể tự chạy su.
 
-Vào Zero Trust → Access controls → Applications → Add application → Self-hosted.
+## 1. Cloudflare Access: phải xác thực toàn bộ tên miền
 
-- Hostname/domain: box.lemanhquyen.io.vn
-- Không đặt path hạn chế: bảo vệ toàn bộ hostname bao gồm /ui/*, /api/v1/*, /configs, /proxies và mọi endpoint của Mihomo.
-- Policy: Allow chỉ email hoặc danh tính của bạn. Dùng OTP/MFA, không cấu hình Bypass hoặc Everyone.
-- Copy **Application Audience (AUD) Tag** của ứng dụng tại Additional settings.
-- Xác định **Team domain** trong Zero Trust (ví dụ: example.cloudflareaccess.com). Không nhầm hostname ứng dụng với team domain.
+Zero Trust → Access → Applications → Self-hosted → tạo ứng dụng cho box.lemanhquyen.io.vn. Bảo vệ **toàn bộ hostname**, không chỉ /ui/ hay /api/v1/. Policy Allow chỉ email/tài khoản của bạn với OTP/MFA. Không dùng Bypass hoặc Everyone. Ghi lại Application Audience (AUD) Tag và Team Domain của Access.
 
-Sau đó mở cửa sổ ẩn danh tới https://box.lemanhquyen.io.vn/ui/; phải có màn hình đăng nhập Access trước khi nhìn thấy giao diện.
-
-## 2. Bật xác minh Cloudflare Access tại Android root
-
-Dùng MT Manager (root), tạo thư mục:
-
-    /data/adb/webuibox-private/hotspot/
-
-Tạo file (chỉ chủ máy đọc, quyền 0600):
+Trên Redmi Note 8T (MT Manager root), tạo:
 
     /data/adb/webuibox-private/hotspot/remote-access.json
 
-Nội dung (thay hai placeholder bằng thông tin Access của bạn):
+Nội dung (thay bằng giá trị thực của chính tài khoản):
 
     {
-      "team_domain": "TEN-TEAM-CUA-BAN.cloudflareaccess.com",
-      "aud": "DAN-APPLICATION-AUDIENCE-TAG-CHINH-XAC-TAI-DAY"
+      "team_domain": "YOUR-TEAM.cloudflareaccess.com",
+      "aud": "YOUR-APPLICATION-AUDIENCE-TAG"
     }
 
-KHÔNG điền box.lemanhquyen.io.vn vào team_domain. Cloudflare Access xác thực dựa trên chữ ký JWT được phát cho đúng AUD của self-hosted application.
+Quyền thư mục 0700, file JSON 0600. Team Domain là miền cloudflareaccess.com, KHÔNG phải box.lemanhquyen.io.vn. Không để file này trong thư mục web công khai.
 
-Không cần khai báo access.key trong file JSON này; Access Key vẫn giữ ở:
+Root Access Key nằm tại:
 
     /data/adb/webuibox-private/hotspot/access.key
 
-Các file này tuyệt đối không được đặt trong /data/adb/box/clash/webuibox/ hoặc upload GitHub.
+File key chỉ được tạo khi root daemon chạy. Không gửi key qua chat hoặc upload lên GitHub.
 
-Nếu file cấu hình chưa có / sai team_domain / sai AUD / JWKS của Access chưa tải được, root API từ xa sẽ từ chối. Đây là hành vi an toàn.
+## 2. Cập nhật WebUiBox v0.0.8 và chạy service Magisk
 
-## 3. Cloudflare Tunnel box-android — hai routes trên CÙNG ĐIỆN THOẠI
+1. Sao lưu thư mục /data/adb/box/clash/webuibox và cấu hình Box. Giải nén gói Release v0.0.8, copy các file vào thư mục đó.
+2. Giữ Mihomo external-controller là 127.0.0.1:9090 và external-ui là /data/adb/box/clash/webuibox. KHÔNG sửa firewall/iptables Box.
+3. Từ MT Manager root, chạy scripts/enable-hotspot.sh (trong thư mục WebUiBox) để tạo service.d. Nếu bạn đã bật backend ở phiên bản trước và dùng trình cài root, launcher sẽ được nâng cấp tự động.
+4. **Khởi động lại điện thoại** một lần để xóa daemon TCP 9097 cũ và nạp 2 tiến trình mới: --root (Unix) và --gateway (localhost).
+5. Mở Chrome trên chính máy chạy Box: http://127.0.0.1:9098/ui/. Vào Phát Wi-Fi hoặc Cập nhật, nhập access.key rồi kết nối backend.
+6. Log để kiểm tra: /data/adb/webuibox-private/hotspot/backend.log và gateway.log.
 
-Chỉ thực hiện khi đã hoàn thành bước Cloudflare Access. Tunnel connector phải chạy trên điện thoại có Box, không phải máy tính/VPS khác, vì 127.0.0.1 trong route là localhost CỦA MÁY CHẠY cloudflared.
+Nếu chỉ copy file bằng MT Manager mà không chạy lại enable-hotspot.sh hoặc cập nhật service.d, launcher cũ có thể vẫn đang khởi động sai tiến trình. Không coi chỉ copy ZIP là hoàn tất kích hoạt backend.
 
-Trong Cloudflare dashboard → Networking → Tunnels → box-android → Routes:
+## 3. Cloudflare Tunnel box-android — CHỈ MỘT ROUTE
 
-| Ưu tiên | Hostname | Path (regex) | Service |
-|---|---|---|---|
-| 1 | box.lemanhquyen.io.vn | ^/api/v1(/.*)?$ | http://127.0.0.1:9097 |
-| 2 | box.lemanhquyen.io.vn | (không ràng buộc) | http://127.0.0.1:9090 |
+Sau khi xác minh Gateway chạy trên 9098, vào Cloudflare → Tunnels → box-android → Routes.
 
-Mihomo phục vụ WebUI tại /ui/. KHÔNG strip prefix /api/v1. Trên Cloudflare Tunnel giữ nguyên HTTP Host Header mặc định: box.lemanhquyen.io.vn. Không đặt override HTTP Host Header thành 127.0.0.1:9097, vì backend kiểm tra host chính xác.
+XÓA route cũ:
 
-Nếu dùng locally managed cloudflared, cấu hình ingress tương ứng:
+    box.lemanhquyen.io.vn /api/v1/* -> http://127.0.0.1:9097
 
-    ingress:
-      - hostname: box.lemanhquyen.io.vn
-        path: ^/api/v1(/.*)?$
-        service: http://127.0.0.1:9097
-      - hostname: box.lemanhquyen.io.vn
-        service: http://127.0.0.1:9090
-      - service: http_status:404
+SỬA route toàn hostname (không có path):
 
-Không cache /api/v1/* trên Cloudflare. Không mở router/firewall port 9097 ra LAN hoặc Internet.
+    Hostname: box.lemanhquyen.io.vn
+    Path: để trống
+    Service: http://127.0.0.1:9098
 
-## 4. Cài WebUiBox v0.0.7 bằng MT Manager
+Không còn route riêng cho API và không trực tiếp trỏ Cloudflare vào 9090. Cloudflared phải chạy trên chính Redmi Note 8T, vì localhost ở đây là máy đang chạy cloudflared.
 
-1. Sao lưu /data/adb/box/clash/webuibox/ và cấu hình Box.
-2. Tải webuibox-v0.0.7.zip tại GitHub Releases. Giải nén và chép các file vào /data/adb/box/clash/webuibox/ như trước.
-3. Giữ external-ui: /data/adb/box/clash/webuibox và external-controller: 127.0.0.1:9090 trong Mihomo.
-4. Nếu backend chưa bật: kích hoạt script /data/adb/box/clash/webuibox/scripts/enable-hotspot.sh bằng root. Script tạo service.d; KHÔNG tự bật phát Wi-Fi.
-5. Đặt remote-access.json (bước 2), sau đó **khởi động lại máy** để nạp backend ARM64 v0.0.7. Không chỉ chép đè binary khi tiến trình cũ còn chạy.
-6. Đăng nhập Cloudflare Access qua https://box.lemanhquyen.io.vn/ui/, mở Phát Wi-Fi hoặc Cập nhật và nhập access.key của điện thoại. Trình duyệt gọi HTTPS same-origin /api/v1/*.
-7. Thử ở localhost http://127.0.0.1:9090/ui/ nếu đường truyền Cloudflare chưa hoạt động. Access JWT **không bắt buộc** khi truy cập trực tiếp localhost, nhưng key vẫn bắt buộc.
+Không override HTTP Host Header thành localhost. Không strip header Cf-Access-Jwt-Assertion. Không cache /api/v1/*.
 
-## 5. Kiểm tra và lỗi
+Từ xa dùng:
 
-- 404 từ /api/v1/status: sai route / thứ tự route / đã đi vào Mihomo thay vì backend.
-- 502: cloudflared không kết nối được 127.0.0.1:9097 trên điện thoại, hoặc backend chưa chạy.
-- 403: thiếu/sai Access JWT, sai Team Domain / Audience, sai Host Header hoặc Origin.
-- 401: sai Access Key root. Đừng đưa key qua ảnh, chat, GitHub.
-- Trang HTML Cloudflare Access thay vì JSON: chưa đăng nhập Access/Access policy chưa bảo vệ cả API.
-- Nếu dùng ox.lemanhquyen.io.vn cũ, chỉ web UI có thể mở được; Root Backend v0.0.7 CHỈ cho phép từ xa qua box.lemanhquyen.io.vn và đúng Access JWT.
+    https://box.lemanhquyen.io.vn/ui/
 
-Lưu ý: Cloudflare Access làm lớp bảo vệ đăng nhập; token ở phía origin vẫn được xác minh bằng JWKS của Team Domain và AUD, không tin mù quáng vào bất kỳ HTTP header nào từ Internet.
+Phải đăng nhập Cloudflare Access trước khi nhìn thấy WebUI. Nếu Cloudflare Access chưa bảo vệ hostname đúng, DỪNG sử dụng route từ xa.
 
-**Quan trọng:** Các chức năng hạn mức IPv4/ARP và bật/tắt Wi-Fi vẫn là bản Beta phụ thuộc MIUI; không bảo đảm quản lý khách nối hoặc ngắt chính xác 100%. Không thay đổi thiết lập proxy/iptables của Box khi thêm remote support.
+## 4. Cách kiểm tra và lỗi
+
+- 502 trên tên miền: Gateway 9098 chưa chạy hoặc cloudflared không chạy cùng điện thoại.
+- 403: sai Team Domain, AUD, Access token, origin hoặc thiếu JWKS/cấu hình. Gateway từ chối khi thiếu xác thực.
+- 401 khi bấm root: sai Access Key trên thiết bị.
+- 503 /api/v1/: Unix socket root backend chưa chạy. Xem backend.log.
+- WebUI chạy trên 9090 nhưng lệnh root không hoạt động: mở **9098** hoặc HTTPS tên miền Cloudflare đúng.
+- CPU/RAM/Core không hiển thị: kiểm tra /ui/box-status.json và bridge service.d/webuibox-status.sh.
+- Bật tắt Hotspot qua Android 11 Binder, giới hạn IPv4 qua iptables vẫn là beta. Tùy MIUI/IPv6/offload, không cam kết độ chính xác hay tương thích 100%.
+
+## 5. Quyền riêng tư / Bảo mật
+
+Port 9098 là localhost HTTP phục vụ Tunnel, không phải một API root TCP. Unix socket được đặt trong thư mục chỉ root đọc. Cloudflare Access JWT được kiểm tra chữ ký tại gateway và socket backend, còn mọi thao tác root cần khóa thiết bị riêng. Không đưa cổng 9098 ra Wi-Fi LAN/Internet hay mở tunnel phụ không có Access.
