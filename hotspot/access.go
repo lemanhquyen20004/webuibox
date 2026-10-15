@@ -149,6 +149,11 @@ func allowedRemoteAccess(r *http.Request)error{
 func isLocalRequest(r *http.Request)bool{
  // Host is checked exactly; no untrusted X-Forwarded-* header is relied upon.
  if r.Host!="127.0.0.1:9097" && r.Host!="localhost:9097"{return false}
+ // Reject requests with proxy headers, even if Tunnel origin mistakenly rewrites
+ // Host to localhost. This prevents silently downgrading remote JWT checks.
+ for _,header:=range []string{"Cf-Connecting-Ip","Cf-Ray","X-Forwarded-For","X-Forwarded-Proto","Forwarded"}{
+  if r.Header.Get(header)!=""{return false}
+ }
  origin:=r.Header.Get("Origin")
  return origin==""||origin=="http://127.0.0.1:9090"||origin=="http://localhost:9090"
 }
