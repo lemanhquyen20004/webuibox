@@ -34,7 +34,12 @@
   });
   let lang = localStorage.getItem("webuibox.lang") === "en" ? "en" : "vi";
   let demo = localStorage.getItem("webuibox.demo") === "true";
-  let endpoint = localStorage.getItem("webuibox.endpoint") || (location.protocol.startsWith("http") ? location.origin : "http://127.0.0.1:9090");
+  // Browser requests behind Cloudflare (or local 9098 gateway) must go to
+  // the one same-origin gateway, even if an older install stored 9090 locally.
+  const onSecureGateway=(location.hostname==="box.lemanhquyen.io.vn"&&location.protocol==="https:")
+    ||(["127.0.0.1","localhost"].includes(location.hostname)&&location.port==="9098"&&location.protocol==="http:");
+  let endpoint=onSecureGateway?location.origin
+    :(localStorage.getItem("webuibox.endpoint") || (location.protocol.startsWith("http") ? location.origin : "http://127.0.0.1:9090"));
   let secret = sessionStorage.getItem("webuibox.secret") || "";
   let currentPage = "overview";
   let live = false;
