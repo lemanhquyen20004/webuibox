@@ -67,13 +67,13 @@ test('box-status.json is bundled as safe placeholder and never publishes phone s
 
 test('owner-domain API stays same-origin HTTPS with a private backend',()=>{
  for(const src of [read('hotspot.js'),read('updater-ui.js')]){
-  assert.match(src,/ox\.lemanhquyen\.io\.vn/);
+  assert.match(src,/box\.lemanhquyen\.io\.vn/);
   assert.match(src,/isOwnerHttps/);
   assert.match(src,/location\.origin/);
   assert.match(src,/127\.0\.0\.1:9097/);
  }
  const root=read('hotspot/main.go');
- assert.match(root,/https:\/\/ox\.lemanhquyen\.io\.vn/);
+ assert.match(read("hotspot/access.go"),/box\.lemanhquyen\.io\.vn/);
  assert.match(root,/X-WebUiBox-Key/);
  assert.match(root,/127\.0\.0\.1:9097/);
 });
