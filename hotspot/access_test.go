@@ -24,6 +24,8 @@ func TestLocalOriginHost(t *testing.T){
  if !isLocalRequest(r){t.Fatal("localhost rejected")}
  r.Header.Set("Origin","https://evil.example")
  if isLocalRequest(r){t.Fatal("cross origin accepted")}
+ r.Header.Set("Origin","http://127.0.0.1:9098")
+ if !isLocalRequest(r){t.Fatal("gateway same origin rejected")}
  r.Header.Set("Origin",ownerOrigin)
  if isLocalRequest(r){t.Fatal("remote origin accepted locally")}
  r.Header.Del("Origin")
