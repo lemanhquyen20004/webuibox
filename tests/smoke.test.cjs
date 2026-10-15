@@ -62,5 +62,5 @@ test('box-status.json is bundled as safe placeholder and never publishes phone s
  assert.equal(m.updated_at,null);
  assert.match(read('.github/workflows/release.yml'),/updater-ui.js box-status.json update.json/);
  assert.match(read('scripts/install.sh'),/update.json box-status.json/);
- assert.match(read('hotspot/updater.go'),/'+'/'+'box-status.json'+'/'+'/);
+ assert.ok(read('hotspot/updater.go').includes('"box-status.json"'));
 });
