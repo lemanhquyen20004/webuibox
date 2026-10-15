@@ -96,10 +96,23 @@ Every release now ships a neutral `box-status.json` (unknown/null placeholders, 
 A manual ZIP copy of HTML/JS alone does not activate the root bridge; enable it once with root and keep `service.d/webuibox-status.sh` enabled. Updates do not require manually recreating the JSON thereafter. If hosting the UI via a different domain, ensure the `/ui/box-status.json` path resolves to the phone's instance. Avoid publishing local device data publicly.
 
 
-## v0.0.7 — Verified Cloudflare Access JWT for remote root API
+## v0.0.8 — Verified Cloudflare Access JWT for remote root API
 
 On the Android-hosted Tunnel domain **https://box.lemanhquyen.io.vn**, the WebUI calls its root API via same-origin HTTPS /api/v1/, while direct localhost access remains unchanged. Unlike v0.0.6, **remote requests to the root daemon are fail-closed unless the configured Cloudflare Access RS256 JWT is cryptographically verified (team domain + application audience) AND the independent root device access key is present**.
 
 Before routing port 9097, protect the **entire** box.lemanhquyen.io.vn hostname in Cloudflare Zero Trust Access (self-hosted application, only your own identity, no Bypass). Install /data/adb/webuibox-private/hotspot/remote-access.json with the verified Team Domain and AUD. Keep root access.key private and outside the web root. Then create the Tunnel's API regex route ahead of its UI route, restart the Android backend by rebooting, and sign in with Access before entering the key in the WebUI.
 
 Full setup instructions and diagnostic codes: [docs/cloudflare-owner-domain.md](docs/cloudflare-owner-domain.md). Neither the phone's proxy configuration nor MIUI hotspot rules are changed by this remote access work.
+
+
+## v0.0.8 — Private Magisk root Unix socket + one Access-protected gateway
+
+Privileged root operations are no longer available on TCP 9097. The root daemon listens on a chmod 0600 Unix socket under /data/adb/webuibox-private/hotspot/root-api.sock. A separate HTTP gateway listens ONLY on 127.0.0.1:9098 and reverse-proxies Mihomo WebUI/API/websockets to 127.0.0.1:9090 and /api/v1/* to the Unix root socket.
+
+This is **not a port-free browser**: HTML/JavaScript cannot invoke Android su directly. The single local gateway port is needed for Chrome and Cloudflare Tunnel, while the privileged daemon has no TCP listener.
+
+Upgrade: install v0.0.8, then run scripts/enable-hotspot.sh with root (or use root installer that migrates a previously enabled service) and reboot once to retire the v0.0.7 TCP daemon. Browse localhost at http://127.0.0.1:9098/ui/ on the rooted device.
+
+Cloudflare Tunnel: use ONE hostname route box.lemanhquyen.io.vn -> http://127.0.0.1:9098, remove the old API-specific route to 9097 and old UI route to 9090. Protect the entire hostname using Cloudflare Access and configure the exact JWT team domain and AUD in the private remote-access.json. Gateway rejects remote traffic unless the RS256 Cloudflare Access JWT verifies; root calls also require the independent device access.key.
+
+See docs/cloudflare-owner-domain.md for complete setup and rollback. Do not expose local port 9098 to a LAN or unauthenticated Tunnel. Existing Mihomo and hotspot beta limitations remain unchanged.
