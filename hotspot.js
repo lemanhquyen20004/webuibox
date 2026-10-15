@@ -1,12 +1,12 @@
-/* WebUiBox v0.0.7 local Hotspot Manager, no dependency on Mihomo API. */
+/* WebUiBox v0.0.8 local Hotspot Manager, no dependency on Mihomo API. */
 (() => {
 "use strict";
 const $=s=>document.querySelector(s);
 const sessionKey="webuibox.hotspot.sessionKey";
 const approvedDomain="box.lemanhquyen.io.vn";
 const isOwnerHttps=location.protocol==="https:"&&location.hostname===approvedDomain;
-const isLocalhost=location.protocol==="http:"&&["127.0.0.1","localhost"].includes(location.hostname);
-const endpoint=isOwnerHttps?location.origin+"/api/v1":(isLocalhost?"http://127.0.0.1:9097/api/v1":null);
+const isGatewayLocal=location.protocol==="http:"&&["127.0.0.1","localhost"].includes(location.hostname)&&location.port==="9098";
+const endpoint=(isOwnerHttps||isGatewayLocal)?location.origin+"/api/v1":null;
 let accessKey=sessionStorage.getItem(sessionKey)||"";
 let timer=0;
 let connected=false;
@@ -67,7 +67,7 @@ async function call(route,method="GET",data=null){
    ...(data?{body:JSON.stringify(data)}:{})
   });
   if(!r.ok){
-    if(isOwnerHttps&&r.status===404)throw Error("404: Cloudflare Tunnel phải định tuyến /api/v1/* tới 127.0.0.1:9097");
+    if(isOwnerHttps&&r.status===404)throw Error("404: Cloudflare Tunnel phải định tuyến /api/v1/* tới 127.0.0.1:9098");
     const type=r.headers.get("content-type")||"";
     if(isOwnerHttps&&type.includes("text/html"))throw Error("API trả HTML; kiểm tra Cloudflare Access và Tunnel");
     const txt=await r.text();throw Error("HTTP "+r.status+": "+txt.slice(0,200));
@@ -101,7 +101,7 @@ async function refresh(force=false){
   $("#hs-on").disabled=!control;$("#hs-off").disabled=!control;
   $("#hs-toggle-info").textContent=t(control?"toggleAvailable":"toggleUnavailable");
   renderDevices(latest);
-  message(t("ready")+" · 127.0.0.1:9097");
+  message(t("ready")+" · 127.0.0.1:9098");
  }catch(err){
   connected=false;$("#hs-label").textContent=t("disconnected");
   $("#hs-on").disabled=true;$("#hs-off").disabled=true;

@@ -1,5 +1,5 @@
-/* WebUiBox v0.0.7 — authenticated, user-confirmed one-tap UI update.
-   Requires optional root backend (127.0.0.1:9097), enabled separately.
+/* WebUiBox v0.0.8 — authenticated, user-confirmed one-tap UI update.
+   Requires optional root backend (127.0.0.1:9098), enabled separately.
    No arbitrary commands and no automatic root action on page load. */
 (() => {
 "use strict";
@@ -8,8 +8,8 @@ const keyName="webuibox.hotspot.sessionKey";
 const remote="https://raw.githubusercontent.com/lemanhquyen20004/webuibox/main/update.json";
 const approvedDomain="box.lemanhquyen.io.vn";
 const isOwnerHttps=location.protocol==="https:"&&location.hostname===approvedDomain;
-const isLocalhost=location.protocol==="http:"&&["127.0.0.1","localhost"].includes(location.hostname);
-const localBackend=isOwnerHttps?location.origin+"/api/v1/update":(isLocalhost?"http://127.0.0.1:9097/api/v1/update":null);
+const isGatewayLocal=location.protocol==="http:"&&["127.0.0.1","localhost"].includes(location.hostname)&&location.port==="9098";
+const localBackend=(isOwnerHttps||isGatewayLocal)?location.origin+"/api/v1/update":null;
 const t=(vi,en)=>document.documentElement.lang==="en"?en:vi;
 let sessionKey=sessionStorage.getItem(keyName)||"";
 let newest="";
@@ -30,7 +30,7 @@ async function api(path,method="GET",data=null){
   });
   if(!r.ok){
     if(isOwnerHttps&&r.status===403)throw new Error("Cloudflare Access JWT bị từ chối; kiểm tra remote-access.json, team_domain và AUD tag (403)");
-    if(isOwnerHttps&&r.status===404)throw new Error("Cloudflare Tunnel chưa định tuyến /api/v1/* tới 127.0.0.1:9097 (404)");
+    if(isOwnerHttps&&r.status===404)throw new Error("Cloudflare Tunnel chưa định tuyến /api/v1/* tới 127.0.0.1:9098 (404)");
     if(isOwnerHttps&&(r.headers.get("content-type")||"").includes("text/html"))throw new Error("API trả HTML; kiểm tra Tunnel/Access");
     throw new Error("HTTP "+r.status+": "+(await r.text()).slice(0,120));
   }

@@ -1,8 +1,8 @@
 {
   "name": "webuibox",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "private": true,
-  "description": "Mihomo WebUiBox with signed Cloudflare Access JWT verification for remote root API",
+  "description": "WebUiBox: Access-protected localhost gateway 9098 and private Magisk root Unix socket",
   "scripts": {
     "test": "node --test tests/*.test.cjs"
   },
