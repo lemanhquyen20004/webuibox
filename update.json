@@ -1,9 +1,9 @@
 {
   "name": "WebUiBox",
-  "version": "0.0.5",
-  "release_url": "https://github.com/lemanhquyen20004/webuibox/releases/tag/v0.0.5",
+  "version": "0.0.6",
+  "release_url": "https://github.com/lemanhquyen20004/webuibox/releases/tag/v0.0.6",
   "notes": {
-    "vi": "Sửa lỗi mất CPU, RAM và tên Core sau cập nhật: ZIP luôn có box-status.json khởi tạo, tự giữ lại dữ liệu thiết bị và khởi chạy lại Box Bridge.",
-    "en": "Fix missing CPU/RAM/core after updates: ship placeholder box-status.json, preserve the device snapshot and restart the Box Bridge."
+    "vi": "Hỗ trợ Hotspot Manager và cập nhật root qua HTTPS ox.lemanhquyen.io.vn bằng API cùng nguồn; giữ localhost. Cần cấu hình Cloudflare Access và tuyến /api/v1/*.",
+    "en": "Enable same-origin HTTPS owner-domain Hotspot and root updater via protected /api/v1/ Tunnel while keeping localhost."
   }
 }

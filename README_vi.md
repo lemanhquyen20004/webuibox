@@ -103,3 +103,15 @@ Mỗi Release giờ đóng gói kèm file **box-status.json khởi tạo**, giá
 Nếu chỉ dùng MT Manager để **chép đè riêng file HTML/JS** thì script root chưa chắc đã chạy. Muốn CPU/RAM/Core thật hoạt động, vẫn phải bật bridge root tối thiểu một lần. Bản cập nhật sau sẽ không yêu cầu thêm thủ công file JSON nữa khi backend và service đang hoạt động.
 
 **Không upload JSON thật của điện thoại lên GitHub** vì đó là dữ liệu riêng và sẽ không tự thay đổi nếu chỉ lưu trên repo. Khi sử dụng tên miền thay cho `127.0.0.1:9090/ui/`, cần đảm bảo đường dẫn `/ui/box-status.json` được phục vụ đúng; không công khai những dữ liệu thiết bị không cần thiết.
+
+## v0.0.6 — Dùng Hotspot Manager trên tên miền riêng HTTPS
+
+Tên miền hỗ trợ: **https://ox.lemanhquyen.io.vn**. Phần Phát Wi-Fi và Cập nhật sẽ dùng HTTPS cùng tên miền ở đường dẫn `/api/v1/...`, không gọi HTTP 127.0.0.1 từ trang HTTPS. Nếu dùng trực tiếp `http://127.0.0.1:9090/ui/` trên điện thoại thì cơ chế cũ vẫn hoạt động.
+
+**Cần cấu hình Cloudflare Tunnel thủ công** (không chỉ cập nhật WebUI): `^/api/v1(/.*)?$` → `http://127.0.0.1:9097`; các đường dẫn còn lại → `http://127.0.0.1:9090`. Hai địa chỉ localhost phải là trên **điện thoại chạy Box**, không phải localhost của VPS hay máy tính chạy Tunnel.
+
+**Bảo mật bắt buộc:** dùng Cloudflare Zero Trust Access để chỉ tài khoản của bạn vào được toàn bộ `ox.lemanhquyen.io.vn` kể cả API. Không chia sẻ link **không có nghĩa là website đã được bảo vệ**. Giữ `access.key` bí mật và không mở cổng 9097 công khai.
+
+Sau khi cài v0.0.6 phải **khởi động lại điện thoại** để nạp backend ARM64 mới. Lỗi 404 API nghĩa là chưa route đúng, 502 nghĩa là Tunnel không tới được backend, 401 nghĩa là chưa có/sai key, 403 liên quan Origin hoặc Access.
+
+Hướng dẫn chi tiết: [docs/cloudflare-owner-domain.md](docs/cloudflare-owner-domain.md). Chặn thiết bị/giới hạn dung lượng IPv4 và nút bật/tắt Wi-Fi vẫn là tính năng thử nghiệm trên MIUI.
