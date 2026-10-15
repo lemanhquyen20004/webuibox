@@ -175,11 +175,13 @@ func installRelease(next string)(string,error){
  }
  // Restore the independent Box metadata bridge whenever the UI is upgraded.
  // Its service.d entry survives reboots; --once regenerates the JSON now.
- refreshBoxBridge()
+ if err:=refreshBoxBridge();err!=nil{
+  log.Printf("WebUiBox: metadata repair warning after upgrade: %v",err)
+ }
  // Root backend keeps the previously loaded binary until the next reboot.
  return backup,nil
 }
-func refreshBoxBridge(){
+func refreshBoxBridge()error{
  script:=filepath.Join(uiRoot,"bridge/box-status.sh")
  launcher:="#!/system/bin/sh\n/system/bin/sh /data/adb/box/clash/webuibox/bridge/box-status.sh >/dev/null 2>&1 &\n"
  if err:=os.MkdirAll("/data/adb/service.d",0755);err==nil{
@@ -190,11 +192,13 @@ func refreshBoxBridge(){
  ctx,cancel:=context.WithTimeout(context.Background(),8*time.Second)
  defer cancel()
  out,err:=exec.CommandContext(ctx,"/system/bin/sh",script,"--once").CombinedOutput()
- if err!=nil{log.Printf("WebUiBox: status regeneration failed: %v (%s)",err,strings.TrimSpace(string(out)))}
+ if err!=nil{return fmt.Errorf("status regeneration failed: %w (%s)",err,strings.TrimSpace(string(out)))}
  // A detached script exits immediately when a bridge process is already alive.
  cmd:=exec.Command("/system/bin/sh",script)
  cmd.Stdin=nil;cmd.Stdout=io.Discard;cmd.Stderr=io.Discard
- if err=cmd.Start();err!=nil{log.Printf("WebUiBox: cannot start bridge: %v",err)}else{_ = cmd.Process.Release()}
+ if err=cmd.Start();err!=nil{return fmt.Errorf("cannot start metadata bridge: %w",err)}
+ _=cmd.Process.Release()
+ return nil
 }
 func (s *Server)updateStage(stage string){
  s.mu.Lock();s.update.Stage=stage;s.mu.Unlock()
@@ -211,6 +215,12 @@ func (s *Server)runUpdate(next string){
 func (s *Server)updaterHandler(w http.ResponseWriter,r *http.Request){
  if !s.auth(w,r){return}
  switch r.URL.Path {
+ case "/api/v1/update/repair-bridge":
+  if r.Method!="POST"{http.Error(w,"method",405);return}
+  if err:=refreshBoxBridge();err!=nil{
+   http.Error(w,"bridge repair failed: "+err.Error(),503);return
+  }
+  jsonResponse(w,map[string]any{"ok":true,"status_file":"/ui/box-status.json","message":"Box metrics refreshed; service.d bridge launcher repaired"})
  case "/api/v1/update/status":
   if r.Method!="GET"{http.Error(w,"method",405);return}
   s.mu.Lock();status:=s.update;s.mu.Unlock()
