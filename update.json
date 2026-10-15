@@ -1,9 +1,9 @@
 {
   "name": "WebUiBox",
-  "version": "0.0.7",
-  "release_url": "https://github.com/lemanhquyen20004/webuibox/releases/tag/v0.0.7",
+  "version": "0.0.8",
+  "release_url": "https://github.com/lemanhquyen20004/webuibox/releases/tag/v0.0.8",
   "notes": {
-    "vi": "Hỗ trợ tên miền box.lemanhquyen.io.vn, bảo vệ Root Backend bằng Cloudflare Access JWT RS256 (team_domain + AUD) và Access Key; vẫn dùng localhost.",
-    "en": "Secure box.lemanhquyen.io.vn remote root API with cryptographically verified Cloudflare Access RS256 JWT (team domain/AUD) plus device key."
+    "vi": "Chuyển quyền root sang Unix socket; Cloudflare Tunnel chỉ cần route tới cổng nội bộ 9098, giữ Mihomo 9090, bỏ dịch vụ TCP root 9097.",
+    "en": "Privileged root over private Unix socket with a single Access-verified Cloudflare gateway on localhost 9098; Mihomo remains at 9090; no root TCP 9097."
   }
 }

@@ -3,6 +3,7 @@
 set -eu
 [ "$(id -u)" = 0 ] || exit 1
 rm -f /data/adb/service.d/webuibox-hotspot.sh
+# Reboot required to retire root daemon + localhost gateway.
 # Stop daemon via standard process name; backend may be renamed by the kernel.
 pidof webuibox-hotspot-arm64 2>/dev/null | tr ' ' '\n' | while read -r pid; do
  case "$pid" in ''|*[!0-9]*) ;; *) kill "$pid" 2>/dev/null || true ;; esac
@@ -16,4 +17,4 @@ iptables -w 3 -t mangle -F WUBX_IN 2>/dev/null || true
 iptables -w 3 -t mangle -F WUBX_OUT 2>/dev/null || true
 iptables -w 3 -t mangle -X WUBX_IN 2>/dev/null || true
 iptables -w 3 -t mangle -X WUBX_OUT 2>/dev/null || true
-echo "Hotspot beta stopped. Reboot if firewall counters or processes remain."
+echo "Root daemon disabled on next boot. Reboot now to stop gateway."

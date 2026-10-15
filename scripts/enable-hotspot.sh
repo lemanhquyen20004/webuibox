@@ -1,23 +1,25 @@
 #!/system/bin/sh
-# Explicitly opt into running the WebUiBox hotspot beta backend (localhost only).
+# Opt-in Magisk Unix backend + ONE localhost gateway (never root TCP 9097).
 set -eu
-[ "$(id -u)" = 0 ] || { echo "Run with root";exit 1; }
+[ "$(id -u)" = 0 ] || { echo "Root required";exit 1; }
 BIN=/data/adb/box/clash/webuibox/hotspot/webuibox-hotspot-arm64
 START=/data/adb/service.d/webuibox-hotspot.sh
-[ -f "$BIN" ] || { echo "ARM64 backend missing: $BIN";exit 1; }
-chmod 0700 "$BIN"
+[ -f "$BIN" ] || { echo "Missing ARM64 backend: $BIN";exit 1; }
 mkdir -p /data/adb/service.d /data/adb/webuibox-private/hotspot
-chmod 0700 /data/adb/webuibox-private /data/adb/webuibox-private/hotspot
+chmod 0700 /data/adb/webuibox-private /data/adb/webuibox-private/hotspot "$BIN"
 cat > "$START" <<'EOF'
 #!/system/bin/sh
 BIN=/data/adb/box/clash/webuibox/hotspot/webuibox-hotspot-arm64
+PRIVATE=/data/adb/webuibox-private/hotspot
 if [ -x "$BIN" ]; then
-  "$BIN" >/data/adb/webuibox-private/hotspot/backend.log 2>&1 &
+ mkdir -p "$PRIVATE"
+ chmod 0700 /data/adb/webuibox-private "$PRIVATE"
+ "$BIN" --root >"$PRIVATE/backend.log" 2>&1 &
+ "$BIN" --gateway >"$PRIVATE/gateway.log" 2>&1 &
 fi
 EOF
 chmod 0700 "$START"
-echo "Root hotspot beta service enabled for next boot."
-echo "To start now, run: /system/bin/sh $START"
-echo "After start, find access.key in /data/adb/webuibox-private/hotspot/ using MT Manager root."
-echo "For Android 11 experimental hotspot toggle, additional explicit allow-android11-binder file is needed; otherwise toggle stays disabled."
-echo "Remote Tunnel requires verified Cloudflare Access JWT and device key; configure remote-access.json first."
+echo "WebUiBox Unix root daemon + local gateway enabled for next boot."
+echo "Reboot Android to retire the old TCP 9097 daemon."
+echo "Gateway UI: http://127.0.0.1:9098/ui/"
+echo "Cloudflare Tunnel: ONE route to http://127.0.0.1:9098."

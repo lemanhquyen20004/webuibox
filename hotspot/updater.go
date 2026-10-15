@@ -173,6 +173,16 @@ func installRelease(next string)(string,error){
   if revert:=os.Rename(backup,uiRoot);revert!=nil{return backup,fmt.Errorf("install failed; restore from %s: %w",backup,revert)}
   return "",fmt.Errorf("install failed and old UI restored: %w",err)
  }
+ // Preserve the user's previous explicit Root Backend opt-in across upgrades.
+ // Update the on-boot launcher so the new binary starts BOTH the private
+ // Unix service and the localhost gateway after the next Android reboot.
+ if _,statErr:=os.Stat("/data/adb/service.d/webuibox-hotspot.sh");statErr==nil{
+  launcher:=filepath.Join(uiRoot,"scripts/enable-hotspot.sh")
+  ctx,cancel:=context.WithTimeout(context.Background(),8*time.Second)
+  out,runErr:=exec.CommandContext(ctx,"/system/bin/sh",launcher).CombinedOutput()
+  cancel()
+  if runErr!=nil{log.Printf("WebUiBox gateway service migration failed (reboot may need manual setup): %v, %s",runErr,strings.TrimSpace(string(out)))}
+ }
  // Restore the independent Box metadata bridge whenever the UI is upgraded.
  // Its service.d entry survives reboots; --once regenerates the JSON now.
  if err:=refreshBoxBridge();err!=nil{

@@ -117,16 +117,31 @@ Sau khi cài v0.0.6 phải **khởi động lại điện thoại** để nạp 
 Hướng dẫn chi tiết: [docs/cloudflare-owner-domain.md](docs/cloudflare-owner-domain.md). Chặn thiết bị/giới hạn dung lượng IPv4 và nút bật/tắt Wi-Fi vẫn là tính năng thử nghiệm trên MIUI.
 
 
-## v0.0.7 — Root Backend từ xa, bảo vệ bằng Cloudflare Access JWT
+## v0.0.8 — Root Backend từ xa, bảo vệ bằng Cloudflare Access JWT
 
 Tên miền chính thức theo Tunnel box-android: **https://box.lemanhquyen.io.vn**. Trước kia WebUI chỉ định ox.lemanhquyen.io.vn, nên hai tên miền bị lệch.
 
-Bản v0.0.7 gọi API root qua HTTPS **cùng tên miền /api/v1/** khi ở box.lemanhquyen.io.vn, vẫn dùng localhost trên chính điện thoại. Root Backend chỉ nghe 127.0.0.1:9097, **và khi có yêu cầu từ xa phải xác thực ĐỒNG THỜI:**
+Bản v0.0.8 gọi API root qua HTTPS **cùng tên miền /api/v1/** khi ở box.lemanhquyen.io.vn, vẫn dùng localhost trên chính điện thoại. Root Backend chỉ nghe 127.0.0.1:9097, **và khi có yêu cầu từ xa phải xác thực ĐỒNG THỜI:**
 - Cloudflare Access JWT có chữ ký RS256 hợp lệ, đúng **Team Domain** và **Application Audience (AUD)** đã cài trên thiết bị; và
 - Access Key bí mật của root backend đã nhập trong WebUI.
 
 **Mặc định KHÓA root API từ xa** nếu chưa cấu hình /data/adb/webuibox-private/hotspot/remote-access.json trên điện thoại. Cloudflare Tunnel bình thường KHÔNG đủ bảo mật để mở root. Trước khi tạo route tới 9097, tạo Cloudflare Access self-hosted application cho **toàn bộ box.lemanhquyen.io.vn**, chính sách chỉ tài khoản của bạn, bật xác thực mạnh và không Bypass. Không public API nếu bạn chưa làm bước này.
 
-Tunnel Routes: **/api/v1/** dạng regex tới http://127.0.0.1:9097 phải ở TRƯỚC route không có path tới http://127.0.0.1:9090. Trên điện thoại Android dùng MT Manager root để ghi Team Domain + AUD vào remote-access.json (đường dẫn ở trên); giữ access.key ngoài thư mục WebUI. Sau khi chép v0.0.7 phải reboot để nạp backend ARM64 mới. Để dùng tính năng remote, Cloudflare Access login và backend key đều phải đúng.
+Tunnel Routes: **/api/v1/** dạng regex tới http://127.0.0.1:9097 phải ở TRƯỚC route không có path tới http://127.0.0.1:9090. Trên điện thoại Android dùng MT Manager root để ghi Team Domain + AUD vào remote-access.json (đường dẫn ở trên); giữ access.key ngoài thư mục WebUI. Sau khi chép v0.0.8 phải reboot để nạp backend ARM64 mới. Để dùng tính năng remote, Cloudflare Access login và backend key đều phải đúng.
 
 **Hướng dẫn từng bước, mẫu JSON và kiểm tra 401/403/404/502:** [docs/cloudflare-owner-domain.md](docs/cloudflare-owner-domain.md). Không thay proxy/iptables hiện tại. Các nút Hotspot trên MIUI vẫn là thử nghiệm.
+
+
+## v0.0.8 — Dịch vụ Magisk Root không cần cổng API 9097
+
+Bản v0.0.8 đổi kiến trúc: **không còn server root lắng nghe TCP 9097**. Backend Magisk root cung cấp API trong Unix socket nội bộ (/data/adb/webuibox-private/hotspot/root-api.sock) được bảo vệ bởi quyền filesystem và key. Để Chrome và Cloudflare Tunnel dùng được WebUiBox, một gateway HTTP chỉ nghe **127.0.0.1:9098**; nó forward Mihomo/UI sang 9090 và các lệnh root qua socket.
+
+Vì trình duyệt Chrome không trực tiếp thực thi được su, **một gateway HTTP localhost vẫn bắt buộc**. Không mở 9098 trên mạng LAN. WebUI dùng được ở http://127.0.0.1:9098/ui/ trên điện thoại có Box hoặc https://box.lemanhquyen.io.vn/ui/ qua Cloudflare Access.
+
+**Nâng cấp từ v0.0.7:** tải ZIP, cài bằng script root hoặc chép với MT Manager rồi chạy lại scripts/enable-hotspot.sh qua root. Reboot một lần để dừng daemon 9097 cũ và khởi chạy --root / --gateway. Nếu chỉ copy file mà không khởi động lại thì tính năng root sẽ chưa hoạt động.
+
+**Cloudflare Tunnel:** Sửa toàn hostname box.lemanhquyen.io.vn trỏ tới http://127.0.0.1:9098; **xóa route riêng /api/v1/* → 9097**. Phải bảo vệ toàn tên miền bằng Cloudflare Access và cấu hình remote-access.json (Team Domain + AUD) trong thư mục private. Gateway xác minh chữ ký Access JWT, và thao tác root cần thêm access.key. **Không tạo bản ghi DNS/cổng 9097 mới.**
+
+Chi tiết cài đặt, MT Manager, JWT, Tunnel và xử lý lỗi: docs/cloudflare-owner-domain.md.
+
+Các chức năng Mihomo vẫn như cũ. Bật/tắt Wi-Fi, hạn mức IPv4 có thể chưa tương thích mọi MIUI; chưa xác minh trên Redmi Note 8T cụ thể.

@@ -7,10 +7,10 @@ const path=require('node:path');
 const read=name=>fs.readFileSync(path.join(__dirname,'..',name),'utf8');
 test('published package and UI versions match',()=>{
   const pkg=JSON.parse(read('package.json')),manifest=JSON.parse(read('update.json'));
-  assert.equal(pkg.version,'0.0.7');
+  assert.equal(pkg.version,'0.0.8');
   assert.equal(pkg.version,manifest.version);
-  assert.match(read('app.js'),/const VERSION = "0.0.7"/);
-  assert.match(read('index.html'),/WebUiBox • v0.0.7/);
+  assert.match(read('app.js'),/const VERSION = "0.0.8"/);
+  assert.match(read('index.html'),/WebUiBox • v0.0.8/);
 });
 test('all referenced DOM ids exist and are unique',()=>{
   const app=read('app.js'),html=read('index.html');
@@ -33,7 +33,7 @@ test('scripts validate as POSIX shell syntax',()=>{
 });
 test('hotspot uses authenticated localhost API and private key outside web root',()=>{
   const go=read('hotspot/main.go');
-  assert.match(go,/127\.0\.0\.1:9097/);
+  assert.match(read("hotspot/gateway.go"),/127\.0\.0\.1:9098/);
   assert.match(go,/webuibox-private\/hotspot/);
   assert.match(go,/X-WebUiBox-Key/);
   assert.match(go,/allow-android11-binder/);
@@ -70,12 +70,12 @@ test('owner-domain API stays same-origin HTTPS with a private backend',()=>{
   assert.match(src,/box\.lemanhquyen\.io\.vn/);
   assert.match(src,/isOwnerHttps/);
   assert.match(src,/location\.origin/);
-  assert.match(src,/127\.0\.0\.1:9097/);
+  assert.match(src,/127\.0\.0\.1:9098/);
  }
  const root=read('hotspot/main.go');
  assert.match(read("hotspot/access.go"),/box\.lemanhquyen\.io\.vn/);
  assert.match(root,/X-WebUiBox-Key/);
- assert.match(root,/127\.0\.0\.1:9097/);
+ assert.match(read("hotspot/gateway.go"),/rootSocket/);
 });
 
 test('remote root API is fail-closed behind signature-checked Access JWT',()=>{
@@ -88,4 +88,15 @@ test('remote root API is fail-closed behind signature-checked Access JWT',()=>{
  assert.match(read('hotspot/main.go'),/allowedRemoteAccess/);
  assert.match(read('hotspot/main.go'),/X-WebUiBox-Key/);
  assert.match(read('docs/cloudflare-owner-domain.md'),/box.lemanhquyen.io.vn/);
+});
+
+test('Unix backend has no privileged TCP port',()=>{
+ assert.match(read('hotspot/gateway.go'),/root-api\.sock/);
+ assert.match(read('hotspot/gateway.go'),/127\.0\.0\.1:9098/);
+ assert.match(read('hotspot/gateway.go'),/allowedRemoteAccess/);
+ assert.doesNotMatch(read('hotspot/main.go'),/127\.0\.0\.1:9097/);
+ assert.match(read('scripts/enable-hotspot.sh'),/--root/);
+ assert.match(read('scripts/enable-hotspot.sh'),/--gateway/);
+ assert.doesNotMatch(read('hotspot.js'),/127\.0\.0\.1:9097/);
+ assert.doesNotMatch(read('updater-ui.js'),/127\.0\.0\.1:9097/);
 });

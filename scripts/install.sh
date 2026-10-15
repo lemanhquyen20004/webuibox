@@ -1,5 +1,5 @@
 #!/system/bin/sh
-# WebUiBox v0.0.7. Installs under Mihomo SAFE_PATHS instead of /data/adb/box/webuibox.
+# WebUiBox v0.0.8. Installs under Mihomo SAFE_PATHS instead of /data/adb/box/webuibox.
 set -eu
 [ "$(id -u)" = 0 ] || { echo "Run as root"; exit 1; }
 SOURCE="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
@@ -35,6 +35,11 @@ if [ -f /data/adb/box/clash/webuibox/bridge/box-status.sh ]; then
 fi
 EOF
 chmod 755 "$BOOT"
+# Migrate existing opt-in service, but never auto-enable on new installs.
+if [ -f /data/adb/service.d/webuibox-hotspot.sh ]; then
+ /system/bin/sh "$DEST/scripts/enable-hotspot.sh" || echo "Warning: gateway service migration failed" >&2
+ echo "Reboot Android once to migrate from TCP 9097 to private Unix socket."
+fi
 # Refresh CPU/RAM/bin_name immediately, and keep refreshing without reboot.
 # The daemon's PID guard prevents duplicate copies.
 if ! /system/bin/sh "$DEST/bridge/box-status.sh" --once; then
@@ -45,4 +50,4 @@ echo "Installed: $DEST"
 echo "Hotspot beta is disabled until you explicitly run scripts/enable-hotspot.sh as root."
 echo "Previous version backup: $BACKUP"
 echo "When Mihomo is stopped, set external-ui: $DEST in the current config.yaml"
-echo "Restart Mihomo and open http://127.0.0.1:9090/ui/"
+echo "Mihomo stays at 9090; WebUiBox secure gateway at http://127.0.0.1:9098/ui/"
