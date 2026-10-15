@@ -25,7 +25,6 @@ import (
 
 const (
  base = "/data/adb/webuibox-private/hotspot"
- port = "127.0.0.1:9097"
  chainIn = "WUBX_IN"
  chainOut = "WUBX_OUT"
 )
@@ -296,6 +295,9 @@ func token()string{
  return key
 }
 func main(){
+ if len(os.Args)>1 && os.Args[1]=="--gateway"{runGateway();return}
+ if len(os.Args)>1 && os.Args[1]!="--root"{log.Fatal("usage: webuibox-hotspot-arm64 [--root|--gateway]")}
+
  if os.Geteuid()!=0{log.Fatal("WebUiBox hotspot backend must run as root")}
  s:=&Server{state:state{Rules:map[string]Rule{}},token:token()}
  if file,err:=os.ReadFile(filepath.Join(base,"rules.json"));err==nil{
@@ -319,8 +321,5 @@ func main(){
    s.mu.Unlock()
   }
  }()
- mux:=http.NewServeMux();mux.HandleFunc("/api/v1/update/",s.updaterHandler);mux.HandleFunc("/api/v1/",s.handler)
- server:=&http.Server{Addr:port,Handler:mux,ReadHeaderTimeout:5*time.Second,ReadTimeout:10*time.Second,WriteTimeout:12*time.Second,IdleTimeout:15*time.Second}
- log.Printf("WebUiBox hotspot beta backend on %s",port)
- log.Fatal(server.ListenAndServe())
+ runRootUnixServer(s)
 }

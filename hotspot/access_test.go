@@ -13,14 +13,14 @@ import (
  "time"
 )
 func TestRemoteRequiresExactHost(t *testing.T){
- for _,host:=range []string{"box.lemanhquyen.io.vn.evil.com","ox.lemanhquyen.io.vn","localhost:9097",""} {
+ for _,host:=range []string{"box.lemanhquyen.io.vn.evil.com","ox.lemanhquyen.io.vn","localhost:9098",""} {
   r:=httptest.NewRequest("GET","http://example.com/api/v1/status",nil)
   r.Host=host;r.Header.Set("Origin",ownerOrigin)
   if allowedRemoteAccess(r)==nil{t.Fatalf("allowed untrusted hostname %q",host)}
  }
 }
 func TestLocalOriginHost(t *testing.T){
- r:=httptest.NewRequest("GET","http://127.0.0.1:9097/api/v1/status",nil)
+ r:=httptest.NewRequest("GET","http://127.0.0.1:9098/api/v1/status",nil)
  if !isLocalRequest(r){t.Fatal("localhost rejected")}
  r.Header.Set("Origin","https://evil.example")
  if isLocalRequest(r){t.Fatal("cross origin accepted")}
