@@ -1,4 +1,4 @@
-/* WebUiBox v0.0.4 — authenticated, user-confirmed one-tap UI update.
+/* WebUiBox v0.0.5 — authenticated, user-confirmed one-tap UI update.
    Requires optional root backend (127.0.0.1:9097), enabled separately.
    No arbitrary commands and no automatic root action on page load. */
 (() => {
@@ -12,7 +12,7 @@ let sessionKey=sessionStorage.getItem(keyName)||"";
 let newest="";
 let busy=false;
 let stateTimer=null;
-function currentVersion(){return ($("[data-version]")?.textContent||"0.0.4").replace(/^v/,"").trim();}
+function currentVersion(){return ($("[data-version]")?.textContent||"0.0.5").replace(/^v/,"").trim();}
 function parts(v){return /^\d+\.\d+\.\d+$/.test(v)?v.split(".").map(Number):[0,0,0];}
 function newer(a,b){let x=parts(a),y=parts(b);for(let i=0;i<3;i++)if(x[i]!==y[i])return x[i]>y[i];return false;}
 function text(msg,error=false){const n=$("#oneclick-status");n.textContent=msg;n.style.color=error?"#ffa4b8":"#b0e9df";}
@@ -104,6 +104,19 @@ async function start(){
  if(!input)return;
  input.value=sessionKey;
  $("#oneclick-connect").onclick=connect;
+ $("#oneclick-repair").onclick=async()=>{
+   sessionKey=$("#oneclick-key").value.trim()||sessionKey;
+   if(sessionKey)sessionStorage.setItem(keyName,sessionKey);
+   if(!window.confirm(t("Khôi phục dữ liệu CPU/RAM/Core bằng quyền root?","Repair CPU/RAM/Core metadata with root?")))return;
+   try{
+     const result=await api("/repair-bridge","POST");
+     if(!result.ok)throw Error("bridge service did not confirm repair");
+     text(t("Đã khôi phục Box Bridge. Tải lại trang để xem dữ liệu CPU/RAM/Core.","Box Bridge repaired. Reload to check CPU/RAM/Core."));
+     setTimeout(()=>window.location.reload(),1800);
+   }catch(err){
+     text(t("Không thể khôi phục Bridge: ","Bridge repair failed: ")+err.message,true);
+   }
+ };
  $("#oneclick-install").onclick=begin;
  $("#oneclick-refresh").onclick=async()=>{
   const hasNew=await checkLatest();
