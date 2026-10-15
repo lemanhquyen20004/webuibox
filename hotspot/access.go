@@ -16,7 +16,6 @@ import (
  "math/big"
  "net/http"
  "os"
- "path/filepath"
  "regexp"
  "strings"
  "sync"
