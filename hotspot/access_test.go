@@ -61,7 +61,8 @@ func TestSignedAccessJWT(t *testing.T){
  if err:=verifyAccessJWT(token,cfg);err!=nil{t.Fatalf("valid signed JWT rejected: %v",err)}
  bad:=cfg;bad.Audience=strings.Repeat("b",64)
  if verifyAccessJWT(token,bad)==nil{t.Fatal("wrong Access audience accepted")}
- tampered:=token[:len(token)-1]+"A"
- if tampered==token{tampered=token[:len(token)-1]+"B"}
+ badSig:=append([]byte(nil),sig...)
+ badSig[0]^=0x01 // Alter an actual signed byte, never unused base64 padding bits.
+ tampered:=prefix+"."+base64.RawURLEncoding.EncodeToString(badSig)
  if verifyAccessJWT(tampered,cfg)==nil{t.Fatal("tampered signature accepted")}
 }
