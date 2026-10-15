@@ -35,7 +35,7 @@ jobs:
           set -euo pipefail
           V="$(node -p "require('./package.json').version")"
           FILE="webuibox-v$V.zip"
-          zip -q -r "$FILE" index.html styles.css app.js hotspot.js updater-ui.js box-status.json update.json bridge scripts hotspot/webuibox-hotspot-arm64 LICENSE README.md README_vi.md package.json
+          zip -q -r "$FILE" index.html styles.css app.js hotspot.js updater-ui.js box-status.json update.json bridge scripts hotspot/webuibox-hotspot-arm64 LICENSE README.md README_vi.md docs/cloudflare-owner-domain.md package.json
           sha256sum "$FILE" > "$FILE.sha256"
           echo "FILE=$FILE" >> "$GITHUB_ENV"
           echo "V=$V" >> "$GITHUB_ENV"
