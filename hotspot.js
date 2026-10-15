@@ -1,9 +1,9 @@
-/* WebUiBox v0.0.6 local Hotspot Manager, no dependency on Mihomo API. */
+/* WebUiBox v0.0.7 local Hotspot Manager, no dependency on Mihomo API. */
 (() => {
 "use strict";
 const $=s=>document.querySelector(s);
 const sessionKey="webuibox.hotspot.sessionKey";
-const approvedDomain="ox.lemanhquyen.io.vn";
+const approvedDomain="box.lemanhquyen.io.vn";
 const isOwnerHttps=location.protocol==="https:"&&location.hostname===approvedDomain;
 const isLocalhost=location.protocol==="http:"&&["127.0.0.1","localhost"].includes(location.hostname);
 const endpoint=isOwnerHttps?location.origin+"/api/v1":(isLocalhost?"http://127.0.0.1:9097/api/v1":null);
@@ -57,7 +57,7 @@ function translations(){
 }
 function message(s,err=false){const el=$("#hs-message");el.textContent=s;el.style.color=err?"#ff9daf":"#65efc3";}
 async function call(route,method="GET",data=null){
- if(!endpoint)throw Error("Root controls require HTTPS ox.lemanhquyen.io.vn or local WebUiBox URL");
+ if(!endpoint)throw Error("Root controls require HTTPS box.lemanhquyen.io.vn or local WebUiBox URL");
  if(!accessKey)throw Error(t("auth"));
  const controller=new AbortController();const wait=setTimeout(()=>controller.abort(),8000);
  try {

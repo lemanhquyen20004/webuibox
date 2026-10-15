@@ -63,4 +63,4 @@ jobs:
           gh release create "$TAG" "$FILE" "$FILE.sha256" \
             --target "$GITHUB_SHA" \
             --title "WebUiBox $TAG" \
-            --notes "WebUiBox $TAG: HTTPS custom-domain Hotspot and updater support through Cloudflare Access protected /api/v1/ Tunnel routing, localhost preserved."
+            --notes "WebUiBox $TAG: remote API restricted by Cloudflare Access RS256 JWT and device key; see docs for required Access AUD/team setup."

@@ -1,9 +1,9 @@
 {
   "name": "WebUiBox",
-  "version": "0.0.6",
-  "release_url": "https://github.com/lemanhquyen20004/webuibox/releases/tag/v0.0.6",
+  "version": "0.0.7",
+  "release_url": "https://github.com/lemanhquyen20004/webuibox/releases/tag/v0.0.7",
   "notes": {
-    "vi": "Hỗ trợ Hotspot Manager và cập nhật root qua HTTPS ox.lemanhquyen.io.vn bằng API cùng nguồn; giữ localhost. Cần cấu hình Cloudflare Access và tuyến /api/v1/*.",
-    "en": "Enable same-origin HTTPS owner-domain Hotspot and root updater via protected /api/v1/ Tunnel while keeping localhost."
+    "vi": "Hỗ trợ tên miền box.lemanhquyen.io.vn, bảo vệ Root Backend bằng Cloudflare Access JWT RS256 (team_domain + AUD) và Access Key; vẫn dùng localhost.",
+    "en": "Secure box.lemanhquyen.io.vn remote root API with cryptographically verified Cloudflare Access RS256 JWT (team domain/AUD) plus device key."
   }
 }

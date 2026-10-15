@@ -7,10 +7,10 @@ const path=require('node:path');
 const read=name=>fs.readFileSync(path.join(__dirname,'..',name),'utf8');
 test('published package and UI versions match',()=>{
   const pkg=JSON.parse(read('package.json')),manifest=JSON.parse(read('update.json'));
-  assert.equal(pkg.version,'0.0.6');
+  assert.equal(pkg.version,'0.0.7');
   assert.equal(pkg.version,manifest.version);
-  assert.match(read('app.js'),/const VERSION = "0.0.6"/);
-  assert.match(read('index.html'),/WebUiBox • v0.0.6/);
+  assert.match(read('app.js'),/const VERSION = "0.0.7"/);
+  assert.match(read('index.html'),/WebUiBox • v0.0.7/);
 });
 test('all referenced DOM ids exist and are unique',()=>{
   const app=read('app.js'),html=read('index.html');
@@ -76,4 +76,16 @@ test('owner-domain API stays same-origin HTTPS with a private backend',()=>{
  assert.match(root,/https:\/\/ox\.lemanhquyen\.io\.vn/);
  assert.match(root,/X-WebUiBox-Key/);
  assert.match(root,/127\.0\.0\.1:9097/);
+});
+
+test('remote root API is fail-closed behind signature-checked Access JWT',()=>{
+ const src=read('hotspot/access.go');
+ assert.match(src,/VerifyPKCS1v15/);
+ assert.match(src,/Audience|audienceContains/);
+ assert.match(src,/teamDomainRE/);
+ assert.match(src,/Cf-Access-Jwt-Assertion/);
+ assert.match(src,/remote-access.json/);
+ assert.match(read('hotspot/main.go'),/allowedRemoteAccess/);
+ assert.match(read('hotspot/main.go'),/X-WebUiBox-Key/);
+ assert.match(read('docs/cloudflare-owner-domain.md'),/box.lemanhquyen.io.vn/);
 });
