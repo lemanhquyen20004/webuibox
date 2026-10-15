@@ -1,0 +1,101 @@
+/* WebUiBox Dark Neon overlay: original Zashboard functionality remains intact. */
+#app-content {
+  --color-base-100: #080f21;
+  --color-base-200: #0b142b;
+  --color-base-300: #233858;
+  --color-base-content: #e9f3ff;
+  --color-primary: #32d6ff;
+  --color-primary-content: #04111b;
+  --color-secondary: #9a70ff;
+  --color-secondary-content: #fff;
+  --color-accent: #20ddc8;
+  --color-accent-content: #031819;
+  --color-neutral: #13284a;
+  --color-neutral-content: #edf5ff;
+  --color-info: #47bcff;
+  --color-success: #35e3ae;
+  --color-warning: #ffc76a;
+  --color-error: #ff799b;
+  --radius-box: 1rem;
+  --radius-field: .65rem;
+  --radius-selector: .8rem;
+  color-scheme: dark;
+  background: radial-gradient(ellipse at 12% 0,rgba(56,90,255,.16),transparent 38%), #070e1c;
+}
+#app-content .home-page {background: transparent}
+#app-content .sidebar {
+  background: linear-gradient(155deg,rgba(11,22,50,.99),rgba(4,11,28,.98));
+  border-right: 1px solid rgba(54,153,255,.2);
+  box-shadow: 9px 0 38px rgba(1,7,26,.25);
+}
+#app-content :is(.base-container,.bg-base-100,.bg-base-200) {
+  border-color: rgba(77,133,217,.2);
+}
+#app-content .nav-item {
+  border-radius: .7rem;
+  transition: color .2s,background .2s,transform .2s;
+}
+#app-content .nav-item:hover {
+  color: #70e7ff;
+  background:rgba(40,120,213,.16);
+}
+#app-content .nav-indicator {
+  background: linear-gradient(100deg,rgba(9,180,244,.17),rgba(127,60,252,.17));
+  border:1px solid rgba(60,186,255,.38);
+  border-left:3px solid #28cfff;
+  border-radius:.7rem;
+  box-shadow:0 0 18px rgba(0,162,255,.13);
+}
+#app-content .tab-bar {
+  border-color:rgba(65,171,255,.32);
+  background:rgba(8,19,46,.88);
+  box-shadow:0 18px 48px rgba(0,5,25,.55),inset 0 1px rgba(255,255,255,.12);
+}
+#app-content .tab-bar-indicator {
+  background:linear-gradient(130deg,rgba(27,167,243,.29),rgba(139,73,255,.27));
+}
+#app-content :is(.btn-primary,.btn-accent) {
+  background:linear-gradient(120deg,#169ff5,#8060ff);
+  border-color:rgba(112,211,255,.5);
+  color:white;
+}
+#app-content :is(.card,.base-container) {
+  backdrop-filter:blur(15px);
+}
+.wb-box-page {color:#e7f5ff}
+.wb-page-header {display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:1rem;margin-bottom:1.4rem}
+.wb-page-header h1 {font-size:clamp(1.55rem,3vw,2.1rem);font-weight:800;letter-spacing:-.04em}
+.wb-page-header p:not(.wb-eyebrow) {color:#95accd;font-size:.86rem;margin-top:.25rem}
+.wb-eyebrow {font-size:.67rem;font-weight:800;letter-spacing:.13em;color:#60d9ff;margin-bottom:.9rem}
+.wb-segments {display:flex;gap:.45rem;padding:.32rem;background:#101c39;border:1px solid #223a60;border-radius:.8rem;width:fit-content;margin-bottom:1.2rem}
+.wb-segments button {padding:.58rem .95rem;border-radius:.56rem;font-weight:600;font-size:.85rem}
+.wb-segments button.selected {color:#e5fcff;background:linear-gradient(110deg,#116eaa,#6443c7);box-shadow:0 0 20px #127cdd28}
+.wb-grid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;max-width:1450px}
+.wb-panel {background:linear-gradient(142deg,rgba(22,38,78,.88),rgba(9,20,45,.91));border:1px solid rgba(93,154,245,.24);box-shadow:0 13px 40px rgba(0,0,0,.17);border-radius:1.15rem;padding:1.35rem;min-width:0}
+.wb-panel h2 {font-weight:750;font-size:1.15rem}
+.wb-primary-status {background:radial-gradient(ellipse at 99% 2%,#2a2f8b48,transparent 70%),linear-gradient(135deg,#112949,#101a3b)}
+.wb-primary-status p {margin-bottom:.6rem}
+.wb-actions {display:flex;gap:.7rem;flex-wrap:wrap;margin:1.2rem 0}
+.wb-status-dot {display:inline-block;height:.8rem;width:.8rem;border-radius:50%;background:#ff708c;box-shadow:0 0 16px #fb426e75}
+.wb-status-dot.running {background:#39e7af;box-shadow:0 0 16px #23ffc08a}
+.wb-btn {background:linear-gradient(110deg,#0d94e2,#714de1);border:1px solid #5c9ee9;border-radius:.65rem;padding:.6rem 1rem;font-size:.86rem;font-weight:650;cursor:pointer;color:#fff}
+.wb-btn:hover {filter:brightness(1.1)}
+.wb-btn:disabled {opacity:.48;cursor:not-allowed}
+.wb-btn-secondary {background:#13274b;border-color:#365481}
+.wb-resource {margin-top:1.25rem}
+.wb-resource>div:first-child {display:flex;justify-content:space-between;align-items:center;font-size:.87rem}
+.wb-meter {height:.55rem;background:#1a2c50;border-radius:100px;overflow:hidden;margin-top:.5rem}
+.wb-meter i {display:block;height:100%;border-radius:100px;background:linear-gradient(90deg,#008dee,#42e3ff);transition:width .5s}
+.wb-meter i.purple {background:linear-gradient(90deg,#7851ff,#b27eff)}
+.wb-link-grid {display:grid;grid-template-columns:repeat(2,1fr);gap:.7rem}
+.wb-link-grid button {display:flex;justify-content:space-between;gap:.3rem;text-align:left;padding:.85rem;background:#132c50;border:1px solid #294875;border-radius:.8rem;font-weight:600}
+.wb-link-grid button span {color:#42d7ff}
+.wb-hint {color:#9fb1d3;font-size:.79rem;line-height:1.7;margin-top:.7rem}
+.wb-error {color:#ff8cac;font-size:.82rem;margin-top:.6rem;overflow-wrap:anywhere}
+.wb-disclaimer {color:#8ba3c5;font-size:.76rem;line-height:1.7;max-width:960px;margin-top:1.5rem}
+.wb-key {display:block;background:#080f24;color:#edf6ff;border:1px solid #385783;border-radius:.7rem;width:100%;padding:.7rem;margin-top:.8rem;outline-offset:2px}
+.wb-client-row {border-top:1px solid #284065;padding:.9rem 0;display:flex;align-items:center;justify-content:space-between;gap:.8rem}
+.wb-client-row p {font-size:.77rem;opacity:.7}
+.wb-footer {padding:1.4rem 0;font-size:.72rem;color:#7386a8}
+@media (max-width:760px) {.wb-grid {grid-template-columns:1fr}.wb-panel {padding:1rem}.wb-page-header {align-items:flex-start}.wb-link-grid {grid-template-columns:1fr 1fr}.wb-segments {width:100%}.wb-segments button {flex:1}}
+@media (prefers-reduced-motion: reduce) {#app-content .nav-item,.wb-meter i {transition:none}}
