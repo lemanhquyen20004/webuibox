@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#070e1c">
   <meta name="description" content="WebUiBox — Dark Neon dashboard for Mihomo and Box for Root">
-  <title>WebUiBox • v0.0.5</title>
-  <link rel="stylesheet" href="./styles.css?v=0.0.5">
-  <script defer src="./app.js?v=0.0.5"></script>
-<script defer src="./hotspot.js?v=0.0.5"></script>
-  <script defer src="./updater-ui.js?v=0.0.5"></script>
+  <title>WebUiBox • v0.0.6</title>
+  <link rel="stylesheet" href="./styles.css?v=0.0.6">
+  <script defer src="./app.js?v=0.0.6"></script>
+<script defer src="./hotspot.js?v=0.0.6"></script>
+  <script defer src="./updater-ui.js?v=0.0.6"></script>
 </head>
 <body>
 <svg class="icon-sprite" xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
@@ -28,7 +28,7 @@
   <aside class="sidebar" aria-label="Navigation">
     <a href="#overview" class="brand">
       <div class="brand-logo"><svg><use href="#wb-logo"/></svg></div>
-      <div><strong>WebUi<span>Box</span></strong><small>v<span data-version>0.0.5</span> · Box for Root Web UI</small></div>
+      <div><strong>WebUi<span>Box</span></strong><small>v<span data-version>0.0.6</span> · Box for Root Web UI</small></div>
     </a>
     <nav id="desktop-nav" class="sidebar-nav">
       <button data-nav="overview" class="active"><span class="nav-icon"><svg><use href="#wb-home"/></svg></span><span data-i="overview">Tổng quan</span></button>
@@ -40,14 +40,14 @@
       <button data-nav="updates"><span class="nav-icon"><svg><use href="#wb-update"/></svg></span><span data-i="updates">Cập nhật</span><i id="update-dot" class="dot hidden"></i></button><button data-nav="hotspot"><span class="nav-icon"><svg><use href="#wb-wifi"/></svg></span><span data-i="hotspot">Phát Wi-Fi</span></button><button data-nav="tools"><span class="nav-icon"><svg><use href="#wb-tools"/></svg></span><span data-i="tools">Công cụ</span></button><button data-nav="about"><span class="nav-icon"><svg><use href="#wb-info"/></svg></span><span data-i="about">Giới thiệu</span></button>
     </nav>
     <div class="sidebar-bottom">
-      <div class="version-card"><span class="cube"><svg><use href="#wb-logo"/></svg></span><div><strong>WebUiBox</strong><small>v<span data-version>0.0.5</span> <span class="live-dot"></span></small></div></div>
+      <div class="version-card"><span class="cube"><svg><use href="#wb-logo"/></svg></span><div><strong>WebUiBox</strong><small>v<span data-version>0.0.6</span> <span class="live-dot"></span></small></div></div>
       <a href="https://github.com/lemanhquyen20004/webuibox" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       <small>© WebUiBox · MIT</small>
     </div>
   </aside>
   <div class="workspace">
     <header class="topbar">
-      <div class="mobile-brand"><span class="cube"><svg><use href="#wb-logo"/></svg></span><strong>WebUi<span>Box</span></strong><small>v<span data-version>0.0.5</span></small></div>
+      <div class="mobile-brand"><span class="cube"><svg><use href="#wb-logo"/></svg></span><strong>WebUi<span>Box</span></strong><small>v<span data-version>0.0.6</span></small></div>
       <div class="search-box"><span>⌕</span><input id="search" placeholder="Tìm máy chủ, quy tắc, kết nối... / Search" autocomplete="off"></div>
       <div class="header-actions">
         <div id="core-indicator" class="core-indicator offline"><span class="live-dot"></span><span id="core-indicator-text">Chưa kết nối</span></div>
@@ -118,10 +118,10 @@
 <article class="panel hs-notes"><h2 id="hs-usage-title">Giới hạn dữ liệu</h2><p id="hs-usage-notes" class="muted">Dữ liệu đo bằng iptables IPv4 theo IP, không phải thống kê nhà mạng. Bộ đếm có thể bỏ sót lưu lượng tăng tốc phần cứng hoặc IPv6. Hạn mức thử nghiệm không bảo đảm qua khởi động lại.</p></article>
 </section>
 <section id="page-tools" class="page"><div class="page-heading"><div><h1 data-i="tools">Công cụ</h1><p data-i="toolsDesc">Các thao tác an toàn sử dụng API Mihomo.</p></div></div><div class="settings-grid"><article class="panel"><h2 data-i="dnsTools">DNS &amp; Cache</h2><p class="muted" data-i="dnsToolsHelp">Xóa cache DNS và Fake-IP khi cần chẩn đoán mạng.</p><div class="action-grid tools-actions"><button class="small-button" data-goto="settings" data-i="openSettings">Mở cài đặt</button></div></article><article class="panel"><h2 data-i="coreTools">Thông tin core</h2><p class="muted" data-i="coreToolsHelp">Trạng thái bin_name trong settings.ini và phiên bản Mihomo API.</p><div class="code-note">bin_name: <span id="tools-core">—</span></div></article></div></section>
-      <section id="page-about" class="page"><div class="page-heading"><div><h1 data-i="about">Giới thiệu</h1><p>WebUiBox · Dark Neon · VI / EN</p></div></div><article class="panel about-panel"><div class="update-emblem"><svg><use href="#wb-logo"/></svg></div><h2>WebUiBox v<span data-version>0.0.5</span></h2><p data-i="aboutDesc">Giao diện quản lý Mihomo dành cho Box for Root, tối ưu trên điện thoại và máy tính.</p><a class="primary-button" href="https://github.com/lemanhquyen20004/webuibox" target="_blank" rel="noopener noreferrer">GitHub ↗</a></article></section>
-      <section id="page-updates" class="page"><div class="page-heading"><div><h1 data-i="updates">Cập nhật</h1><p data-i="updatesDesc">Kiểm tra phiên bản WebUiBox trên GitHub.</p></div><button id="check-updates" class="primary-button" data-i="checkUpdates">Kiểm tra cập nhật</button></div><div class="panel update-panel"><div class="update-emblem"><svg><use href="#wb-logo"/></svg></div><h2>WebUiBox <span data-version>0.0.5</span></h2><p id="update-status" data-i="latestHint">Đang dùng v0.0.5. Kiểm tra phiên bản mới để nhận thông báo.</p><p class="muted small" data-i="updateMethod">Cập nhật an toàn: xem Release trên GitHub, sau đó chạy script cập nhật có xác minh SHA-256.</p><div class="oneclick-area">
+      <section id="page-about" class="page"><div class="page-heading"><div><h1 data-i="about">Giới thiệu</h1><p>WebUiBox · Dark Neon · VI / EN</p></div></div><article class="panel about-panel"><div class="update-emblem"><svg><use href="#wb-logo"/></svg></div><h2>WebUiBox v<span data-version>0.0.6</span></h2><p data-i="aboutDesc">Giao diện quản lý Mihomo dành cho Box for Root, tối ưu trên điện thoại và máy tính.</p><a class="primary-button" href="https://github.com/lemanhquyen20004/webuibox" target="_blank" rel="noopener noreferrer">GitHub ↗</a></article></section>
+      <section id="page-updates" class="page"><div class="page-heading"><div><h1 data-i="updates">Cập nhật</h1><p data-i="updatesDesc">Kiểm tra phiên bản WebUiBox trên GitHub.</p></div><button id="check-updates" class="primary-button" data-i="checkUpdates">Kiểm tra cập nhật</button></div><div class="panel update-panel"><div class="update-emblem"><svg><use href="#wb-logo"/></svg></div><h2>WebUiBox <span data-version>0.0.6</span></h2><p id="update-status" data-i="latestHint">Đang dùng v0.0.6. Kiểm tra phiên bản mới để nhận thông báo.</p><p class="muted small" data-i="updateMethod">Cập nhật an toàn: xem Release trên GitHub, sau đó chạy script cập nhật có xác minh SHA-256.</p><div class="oneclick-area">
   <h3 data-i="oneClickTitle">Cập nhật WebUiBox một chạm</h3>
-  <p data-i="oneClickHelp">Cần WebUiBox Root Backend đã kích hoạt và Access Key. Lần đầu từ v0.0.3 cần cập nhật thủ công lên v0.0.5 và khởi động lại backend.</p>
+  <p data-i="oneClickHelp">Cần WebUiBox Root Backend đã kích hoạt và Access Key. Lần đầu từ v0.0.3 cần cập nhật thủ công lên v0.0.6 và khởi động lại backend.</p>
   <input id="oneclick-key" type="password" autocomplete="off" spellcheck="false" placeholder="Root Backend Access Key"/>
   <div class="oneclick-buttons">
   <button id="oneclick-connect" class="small-button" type="button" data-i="oneClickConnect">Kết nối Root Backend</button>

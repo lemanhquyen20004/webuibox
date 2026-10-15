@@ -1,9 +1,12 @@
-/* WebUiBox v0.0.3 local Hotspot Manager, no dependency on Mihomo API. */
+/* WebUiBox v0.0.6 local Hotspot Manager, no dependency on Mihomo API. */
 (() => {
 "use strict";
 const $=s=>document.querySelector(s);
 const sessionKey="webuibox.hotspot.sessionKey";
-const endpoint="http://127.0.0.1:9097/api/v1";
+const approvedDomain="ox.lemanhquyen.io.vn";
+const isOwnerHttps=location.protocol==="https:"&&location.hostname===approvedDomain;
+const isLocalhost=location.protocol==="http:"&&["127.0.0.1","localhost"].includes(location.hostname);
+const endpoint=isOwnerHttps?location.origin+"/api/v1":(isLocalhost?"http://127.0.0.1:9097/api/v1":null);
 let accessKey=sessionStorage.getItem(sessionKey)||"";
 let timer=0;
 let connected=false;
@@ -54,6 +57,7 @@ function translations(){
 }
 function message(s,err=false){const el=$("#hs-message");el.textContent=s;el.style.color=err?"#ff9daf":"#65efc3";}
 async function call(route,method="GET",data=null){
+ if(!endpoint)throw Error("Root controls require HTTPS ox.lemanhquyen.io.vn or local WebUiBox URL");
  if(!accessKey)throw Error(t("auth"));
  const controller=new AbortController();const wait=setTimeout(()=>controller.abort(),8000);
  try {
@@ -62,7 +66,12 @@ async function call(route,method="GET",data=null){
    headers:{"X-WebUiBox-Key":accessKey,...(data?{"Content-Type":"application/json"}:{})},
    ...(data?{body:JSON.stringify(data)}:{})
   });
-  if(!r.ok){const txt=await r.text();throw Error("HTTP "+r.status+": "+txt.slice(0,200))}
+  if(!r.ok){
+    if(isOwnerHttps&&r.status===404)throw Error("404: Cloudflare Tunnel phải định tuyến /api/v1/* tới 127.0.0.1:9097");
+    const type=r.headers.get("content-type")||"";
+    if(isOwnerHttps&&type.includes("text/html"))throw Error("API trả HTML; kiểm tra Cloudflare Access và Tunnel");
+    const txt=await r.text();throw Error("HTTP "+r.status+": "+txt.slice(0,200));
+  }
   return await r.json();
  } finally {clearTimeout(wait);}
 }

@@ -63,4 +63,4 @@ jobs:
           gh release create "$TAG" "$FILE" "$FILE.sha256" \
             --target "$GITHUB_SHA" \
             --title "WebUiBox $TAG" \
-            --notes "WebUiBox $TAG: Persistent Box status on updates: bundle neutral box-status.json, preserve live metrics, restart the status bridge. Hotspot remains beta."
+            --notes "WebUiBox $TAG: HTTPS custom-domain Hotspot and updater support through Cloudflare Access protected /api/v1/ Tunnel routing, localhost preserved."

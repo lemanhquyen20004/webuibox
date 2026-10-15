@@ -1,4 +1,4 @@
-/* WebUiBox v0.0.5 — authenticated, user-confirmed one-tap UI update.
+/* WebUiBox v0.0.6 — authenticated, user-confirmed one-tap UI update.
    Requires optional root backend (127.0.0.1:9097), enabled separately.
    No arbitrary commands and no automatic root action on page load. */
 (() => {
@@ -6,17 +6,21 @@
 const $=s=>document.querySelector(s);
 const keyName="webuibox.hotspot.sessionKey";
 const remote="https://raw.githubusercontent.com/lemanhquyen20004/webuibox/main/update.json";
-const localBackend="http://127.0.0.1:9097/api/v1/update";
+const approvedDomain="ox.lemanhquyen.io.vn";
+const isOwnerHttps=location.protocol==="https:"&&location.hostname===approvedDomain;
+const isLocalhost=location.protocol==="http:"&&["127.0.0.1","localhost"].includes(location.hostname);
+const localBackend=isOwnerHttps?location.origin+"/api/v1/update":(isLocalhost?"http://127.0.0.1:9097/api/v1/update":null);
 const t=(vi,en)=>document.documentElement.lang==="en"?en:vi;
 let sessionKey=sessionStorage.getItem(keyName)||"";
 let newest="";
 let busy=false;
 let stateTimer=null;
-function currentVersion(){return ($("[data-version]")?.textContent||"0.0.5").replace(/^v/,"").trim();}
+function currentVersion(){return ($("[data-version]")?.textContent||"0.0.6").replace(/^v/,"").trim();}
 function parts(v){return /^\d+\.\d+\.\d+$/.test(v)?v.split(".").map(Number):[0,0,0];}
 function newer(a,b){let x=parts(a),y=parts(b);for(let i=0;i<3;i++)if(x[i]!==y[i])return x[i]>y[i];return false;}
 function text(msg,error=false){const n=$("#oneclick-status");n.textContent=msg;n.style.color=error?"#ffa4b8":"#b0e9df";}
 async function api(path,method="GET",data=null){
+ if(!localBackend)throw new Error("Root API requires HTTPS ox.lemanhquyen.io.vn or localhost");
  if(!sessionKey)throw new Error(t("Hãy nhập Access Key của WebUiBox Root Backend.","Enter the root backend access key."));
  const controller=new AbortController(),stop=setTimeout(()=>controller.abort(),12000);
  try{
@@ -24,7 +28,11 @@ async function api(path,method="GET",data=null){
    headers:{"X-WebUiBox-Key":sessionKey,...(data?{"Content-Type":"application/json"}:{})},
    ...(data?{body:JSON.stringify(data)}:{})
   });
-  if(!r.ok)throw new Error("HTTP "+r.status+": "+(await r.text()).slice(0,120));
+  if(!r.ok){
+    if(isOwnerHttps&&r.status===404)throw new Error("Cloudflare Tunnel chưa định tuyến /api/v1/* tới 127.0.0.1:9097 (404)");
+    if(isOwnerHttps&&(r.headers.get("content-type")||"").includes("text/html"))throw new Error("API trả HTML; kiểm tra Tunnel/Access");
+    throw new Error("HTTP "+r.status+": "+(await r.text()).slice(0,120));
+  }
   return await r.json();
  }finally{clearTimeout(stop);}
 }

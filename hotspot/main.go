@@ -1,6 +1,6 @@
 package main
 
-// WebUiBox hotspot daemon for rooted Android. Localhost ONLY.
+// WebUiBox hotspot daemon for rooted Android. Loopback-only; can be reverse proxied using Access-protected HTTPS Tunnel.
 // Limitations: Android 11 binder methods vary across OEM builds; traffic quotas
 // count IPv4 iptables packets, and may miss IPv6 or hardware-offloaded flows.
 import (
@@ -207,7 +207,10 @@ func (s *Server)clientStatus()(string,[]Client){
 }
 func (s *Server)auth(w http.ResponseWriter,r *http.Request)bool{
  origin:=r.Header.Get("Origin")
- allowed:=origin=="http://127.0.0.1:9090"||origin=="http://localhost:9090"
+ // Exact origin allowlist. HTTPS reverse proxy MUST be protected by Cloudflare Access.
+ allowed:=origin=="http://127.0.0.1:9090"||origin=="http://localhost:9090"||origin=="https://ox.lemanhquyen.io.vn"
+ w.Header().Set("Cache-Control","no-store")
+ w.Header().Set("X-Content-Type-Options","nosniff")
  if origin!="" && !allowed{http.Error(w,"origin denied",403);return false}
  if allowed{
   w.Header().Set("Access-Control-Allow-Origin",origin)

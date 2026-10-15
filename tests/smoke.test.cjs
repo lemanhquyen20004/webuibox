@@ -7,10 +7,10 @@ const path=require('node:path');
 const read=name=>fs.readFileSync(path.join(__dirname,'..',name),'utf8');
 test('published package and UI versions match',()=>{
   const pkg=JSON.parse(read('package.json')),manifest=JSON.parse(read('update.json'));
-  assert.equal(pkg.version,'0.0.5');
+  assert.equal(pkg.version,'0.0.6');
   assert.equal(pkg.version,manifest.version);
-  assert.match(read('app.js'),/const VERSION = "0.0.5"/);
-  assert.match(read('index.html'),/WebUiBox • v0.0.5/);
+  assert.match(read('app.js'),/const VERSION = "0.0.6"/);
+  assert.match(read('index.html'),/WebUiBox • v0.0.6/);
 });
 test('all referenced DOM ids exist and are unique',()=>{
   const app=read('app.js'),html=read('index.html');
@@ -63,4 +63,17 @@ test('box-status.json is bundled as safe placeholder and never publishes phone s
  assert.match(read('.github/workflows/release.yml'),/updater-ui.js box-status.json update.json/);
  assert.match(read('scripts/install.sh'),/update.json box-status.json/);
  assert.ok(read('hotspot/updater.go').includes('"box-status.json"'));
+});
+
+test('owner-domain API stays same-origin HTTPS with a private backend',()=>{
+ for(const src of [read('hotspot.js'),read('updater-ui.js')]){
+  assert.match(src,/ox\.lemanhquyen\.io\.vn/);
+  assert.match(src,/isOwnerHttps/);
+  assert.match(src,/location\.origin/);
+  assert.match(src,/127\.0\.0\.1:9097/);
+ }
+ const root=read('hotspot/main.go');
+ assert.match(root,/https:\/\/ox\.lemanhquyen\.io\.vn/);
+ assert.match(root,/X-WebUiBox-Key/);
+ assert.match(root,/127\.0\.0\.1:9097/);
 });
