@@ -109,7 +109,7 @@
   <input id="hs-key" class="hs-input" type="password" autocomplete="off" placeholder="Dán access.key từ thư mục hotspot"/>
   <p class="muted small" id="hs-key-help">File: /data/adb/webuibox-private/hotspot/access.key · key chỉ lưu trong session trình duyệt.</p>
   <button id="hs-connect" class="primary-button">Kết nối Backend</button>
-  <p id="hs-message" class="small hs-message">Backend chỉ nghe 127.0.0.1:9097. Không đưa cổng này lên Cloudflare.</p>
+  <p id="hs-message" class="small hs-message">Backend chỉ nghe 127.0.0.1:9097. Truy cập tên miền HTTPS cần Cloudflare Access và Tunnel định tuyến /api/v1/*; không mở cổng 9097 công khai.</p>
   </article>
 </div>
 <article class="panel hs-device-panel"><div class="panel-title"><h2 id="hs-device-title">Thiết bị đang kết nối</h2><span class="tag" id="hs-count">0</span></div>
