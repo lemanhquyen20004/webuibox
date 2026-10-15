@@ -35,7 +35,7 @@ var safeVersion=regexp.MustCompile("^[0-9]+\\.[0-9]+\\.[0-9]+$")
 var safeSha=regexp.MustCompile("^[0-9a-f]{64}$")
 var updateClient=&http.Client{Timeout:90*time.Second}
 var updateFiles=[]string{
- "index.html", "app.js", "styles.css", "hotspot.js", "updater-ui.js", "update.json",
+ "index.html", "app.js", "styles.css", "hotspot.js", "updater-ui.js", "update.json", "box-status.json",
  "bridge/box-status.sh", "scripts/install.sh", "scripts/update.sh",
  "scripts/enable-hotspot.sh", "scripts/disable-hotspot.sh",
  "hotspot/webuibox-hotspot-arm64",
@@ -159,8 +159,8 @@ func installRelease(next string)(string,error){
  if err!=nil{return "",err}
  defer os.RemoveAll(stage)
  if err=unpackRelease(bytes,stage,next);err!=nil{return "",err}
- // box-status.json is runtime device data, never part of the release package.
- // Preserve a validated snapshot during the brief atomic directory swap.
+ // Each release includes a non-device-specific box-status.json placeholder.
+ // Preserve a validated live snapshot during the atomic directory swap.
  statusPath:=filepath.Join(uiRoot,"box-status.json")
  if stat,statErr:=os.Lstat(statusPath);statErr==nil && stat.Mode().IsRegular() && stat.Size()<8192{
   if state,readErr:=os.ReadFile(statusPath);readErr==nil && json.Valid(state){

@@ -12,12 +12,12 @@ STAGE="$BOX_DIR/clash/.webuibox-stage-$$"
 BACKUP="$BOX_DIR/clash/webuibox.backup"
 trap 'rm -rf "$STAGE"' EXIT
 mkdir -p "$STAGE/bridge" "$STAGE/scripts" "$STAGE/hotspot"
-for file in index.html app.js hotspot.js updater-ui.js styles.css update.json; do cp "$SOURCE/$file" "$STAGE/$file"; done
+for file in index.html app.js hotspot.js updater-ui.js styles.css update.json box-status.json; do cp "$SOURCE/$file" "$STAGE/$file"; done
 cp "$SOURCE/bridge/box-status.sh" "$STAGE/bridge/box-status.sh"
 for file in install.sh update.sh enable-hotspot.sh disable-hotspot.sh; do cp "$SOURCE/scripts/$file" "$STAGE/scripts/$file"; done
 cp "$SOURCE/hotspot/webuibox-hotspot-arm64" "$STAGE/hotspot/webuibox-hotspot-arm64"
 chmod 755 "$STAGE/hotspot/webuibox-hotspot-arm64" "$STAGE/bridge/box-status.sh" "$STAGE/scripts/"*.sh
-# The live status JSON is generated on the phone, not shipped in a release ZIP.
+# Include a neutral JSON in each release, but retain live phone data during upgrades.
 # Keep the last valid snapshot across upgrades so the dashboard never goes blank
 # solely because the WebUI directory was replaced.
 if [ -f "$DEST/box-status.json" ]; then

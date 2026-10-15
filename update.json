@@ -1,9 +1,9 @@
 {
   "name": "WebUiBox",
-  "version": "0.0.4",
-  "release_url": "https://github.com/lemanhquyen20004/webuibox/releases/tag/v0.0.4",
+  "version": "0.0.5",
+  "release_url": "https://github.com/lemanhquyen20004/webuibox/releases/tag/v0.0.5",
   "notes": {
-    "vi": "Bổ sung cập nhật một chạm ngay WebUiBox: tự tải ZIP từ GitHub, xác minh SHA-256, sao lưu và cài. Cần Root Backend; nâng cấp thủ công một lần từ v0.0.3.",
-    "en": "Opt-in one-tap update in WebUiBox: GitHub download, SHA-256 check, backup and install. Requires Root Backend and one manual upgrade from v0.0.3."
+    "vi": "Sửa lỗi mất CPU, RAM và tên Core sau cập nhật: ZIP luôn có box-status.json khởi tạo, tự giữ lại dữ liệu thiết bị và khởi chạy lại Box Bridge.",
+    "en": "Fix missing CPU/RAM/core after updates: ship placeholder box-status.json, preserve the device snapshot and restart the Box Bridge."
   }
 }

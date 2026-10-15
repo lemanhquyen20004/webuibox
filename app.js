@@ -265,6 +265,7 @@
       if(!response.ok)throw Error("HTTP "+response.status+" (/ui/box-status.json)");
       const data=await response.json();
       const core=typeof data.bin_name==="string"?data.bin_name.trim():"";
+      if(core==="unknown")throw Error(lang==="vi"?"Chưa có dữ liệu từ script root":"Waiting for root status writer");
       if(!/^(?:clash|mihomo|sing-box|xray|v2fly|hysteria|hysteria2)$/.test(core))throw Error("unknown bin");
       bridgeBin=core;
       $("#core-name").textContent=core;
