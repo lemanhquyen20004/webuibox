@@ -35,6 +35,7 @@ insertLang('src/i18n/zh-tw.ts', 'Box Manager')
 replace('src/i18n/index.ts', "import en from './en'", "import en from './en'\nimport vi from './vi'")
 replace('src/i18n/index.ts', '    [LANG.EN_US]: en,', '    [LANG.EN_US]: en,\n    [LANG.VI_VN]: vi,')
 
+replace('src/components/settings/general/LanguageSelect.vue', "  [LANG.RU_RU]: 'Русский',", "  [LANG.RU_RU]: 'Русский',\n  [LANG.VI_VN]: 'Tiếng Việt',")
 replace('src/main.ts', "import './assets/main.css'", "import './assets/main.css'\nimport './assets/webuibox-neon.css'")
 
 const manifest = JSON.parse(fs.readFileSync(file('package.json'), 'utf8'))
