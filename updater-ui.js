@@ -1,4 +1,4 @@
-/* WebUiBox v0.0.6 — authenticated, user-confirmed one-tap UI update.
+/* WebUiBox v0.0.7 — authenticated, user-confirmed one-tap UI update.
    Requires optional root backend (127.0.0.1:9097), enabled separately.
    No arbitrary commands and no automatic root action on page load. */
 (() => {
@@ -6,7 +6,7 @@
 const $=s=>document.querySelector(s);
 const keyName="webuibox.hotspot.sessionKey";
 const remote="https://raw.githubusercontent.com/lemanhquyen20004/webuibox/main/update.json";
-const approvedDomain="ox.lemanhquyen.io.vn";
+const approvedDomain="box.lemanhquyen.io.vn";
 const isOwnerHttps=location.protocol==="https:"&&location.hostname===approvedDomain;
 const isLocalhost=location.protocol==="http:"&&["127.0.0.1","localhost"].includes(location.hostname);
 const localBackend=isOwnerHttps?location.origin+"/api/v1/update":(isLocalhost?"http://127.0.0.1:9097/api/v1/update":null);
@@ -20,7 +20,7 @@ function parts(v){return /^\d+\.\d+\.\d+$/.test(v)?v.split(".").map(Number):[0,0
 function newer(a,b){let x=parts(a),y=parts(b);for(let i=0;i<3;i++)if(x[i]!==y[i])return x[i]>y[i];return false;}
 function text(msg,error=false){const n=$("#oneclick-status");n.textContent=msg;n.style.color=error?"#ffa4b8":"#b0e9df";}
 async function api(path,method="GET",data=null){
- if(!localBackend)throw new Error("Root API requires HTTPS ox.lemanhquyen.io.vn or localhost");
+ if(!localBackend)throw new Error("Root API requires HTTPS box.lemanhquyen.io.vn or localhost");
  if(!sessionKey)throw new Error(t("Hãy nhập Access Key của WebUiBox Root Backend.","Enter the root backend access key."));
  const controller=new AbortController(),stop=setTimeout(()=>controller.abort(),12000);
  try{
@@ -29,6 +29,7 @@ async function api(path,method="GET",data=null){
    ...(data?{body:JSON.stringify(data)}:{})
   });
   if(!r.ok){
+    if(isOwnerHttps&&r.status===403)throw new Error("Cloudflare Access JWT bị từ chối; kiểm tra remote-access.json, team_domain và AUD tag (403)");
     if(isOwnerHttps&&r.status===404)throw new Error("Cloudflare Tunnel chưa định tuyến /api/v1/* tới 127.0.0.1:9097 (404)");
     if(isOwnerHttps&&(r.headers.get("content-type")||"").includes("text/html"))throw new Error("API trả HTML; kiểm tra Tunnel/Access");
     throw new Error("HTTP "+r.status+": "+(await r.text()).slice(0,120));

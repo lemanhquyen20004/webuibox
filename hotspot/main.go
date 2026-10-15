@@ -206,21 +206,34 @@ func (s *Server)clientStatus()(string,[]Client){
  return iface,clients
 }
 func (s *Server)auth(w http.ResponseWriter,r *http.Request)bool{
- origin:=r.Header.Get("Origin")
- // Exact origin allowlist. HTTPS reverse proxy MUST be protected by Cloudflare Access.
- allowed:=origin=="http://127.0.0.1:9090"||origin=="http://localhost:9090"||origin=="https://ox.lemanhquyen.io.vn"
  w.Header().Set("Cache-Control","no-store")
  w.Header().Set("X-Content-Type-Options","nosniff")
- if origin!="" && !allowed{http.Error(w,"origin denied",403);return false}
- if allowed{
+ w.Header().Set("Referrer-Policy","no-referrer")
+ local:=isLocalRequest(r)
+ if !local{
+  // Remote authorization is fail-closed unless the verified Access
+  // team domain and AUD are configured on-device outside the static UI.
+  if err:=allowedRemoteAccess(r);err!=nil{
+   http.Error(w,"remote Cloudflare Access authentication denied: "+err.Error(),403)
+   return false
+  }
+ }
+ origin:=r.Header.Get("Origin")
+ if local && origin!=""{
   w.Header().Set("Access-Control-Allow-Origin",origin)
   w.Header().Set("Vary","Origin")
   w.Header().Set("Access-Control-Allow-Methods","GET,POST,OPTIONS")
   w.Header().Set("Access-Control-Allow-Headers","Content-Type,X-WebUiBox-Key")
  }
- if r.Method=="OPTIONS"{w.WriteHeader(204);return false}
+ if r.Method=="OPTIONS"{
+  if !local{http.Error(w,"remote OPTIONS not supported",405)}else{w.WriteHeader(204)}
+  return false
+ }
+ // JWT alone cannot authorize root operations: require separate device key.
  token:=r.Header.Get("X-WebUiBox-Key")
- if subtle.ConstantTimeCompare([]byte(token),[]byte(s.token))!=1{http.Error(w,"invalid local access key",401);return false}
+ if subtle.ConstantTimeCompare([]byte(token),[]byte(s.token))!=1{
+  http.Error(w,"invalid root backend key",401);return false
+ }
  return true
 }
 func jsonResponse(w http.ResponseWriter,v any){

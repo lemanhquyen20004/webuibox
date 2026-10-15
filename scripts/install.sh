@@ -1,5 +1,5 @@
 #!/system/bin/sh
-# WebUiBox v0.0.5. Installs under Mihomo SAFE_PATHS instead of /data/adb/box/webuibox.
+# WebUiBox v0.0.7. Installs under Mihomo SAFE_PATHS instead of /data/adb/box/webuibox.
 set -eu
 [ "$(id -u)" = 0 ] || { echo "Run as root"; exit 1; }
 SOURCE="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"

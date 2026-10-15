@@ -94,3 +94,12 @@ The Updates page includes **Install update**. After the user connects the authen
 Every release now ships a neutral `box-status.json` (unknown/null placeholders, **no private device data**). The installer and root updater preserve an existing live status snapshot, refresh it from the rooted device, and arrange for the Box status writer to run at boot. Real CPU, RAM, device uptime and selected Box binary are sourced only from the device and refreshed by `bridge/box-status.sh`.
 
 A manual ZIP copy of HTML/JS alone does not activate the root bridge; enable it once with root and keep `service.d/webuibox-status.sh` enabled. Updates do not require manually recreating the JSON thereafter. If hosting the UI via a different domain, ensure the `/ui/box-status.json` path resolves to the phone's instance. Avoid publishing local device data publicly.
+
+
+## v0.0.7 — Verified Cloudflare Access JWT for remote root API
+
+On the Android-hosted Tunnel domain **https://box.lemanhquyen.io.vn**, the WebUI calls its root API via same-origin HTTPS /api/v1/, while direct localhost access remains unchanged. Unlike v0.0.6, **remote requests to the root daemon are fail-closed unless the configured Cloudflare Access RS256 JWT is cryptographically verified (team domain + application audience) AND the independent root device access key is present**.
+
+Before routing port 9097, protect the **entire** box.lemanhquyen.io.vn hostname in Cloudflare Zero Trust Access (self-hosted application, only your own identity, no Bypass). Install /data/adb/webuibox-private/hotspot/remote-access.json with the verified Team Domain and AUD. Keep root access.key private and outside the web root. Then create the Tunnel's API regex route ahead of its UI route, restart the Android backend by rebooting, and sign in with Access before entering the key in the WebUI.
+
+Full setup instructions and diagnostic codes: [docs/cloudflare-owner-domain.md](docs/cloudflare-owner-domain.md). Neither the phone's proxy configuration nor MIUI hotspot rules are changed by this remote access work.

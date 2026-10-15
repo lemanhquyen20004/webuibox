@@ -78,7 +78,7 @@ func readVersion(path string)(string,error){
 func getLimited(url string,limit int64)([]byte,error){
  if !strings.HasPrefix(url,"https://"){return nil,errors.New("only HTTPS allowed")}
  req,err:=http.NewRequest("GET",url,nil);if err!=nil{return nil,err}
- req.Header.Set("User-Agent","WebUiBox-Updater/0.0.4")
+ req.Header.Set("User-Agent","WebUiBox-Updater/0.0.7")
  res,err:=updateClient.Do(req);if err!=nil{return nil,err}
  defer res.Body.Close()
  if res.StatusCode!=200{return nil,fmt.Errorf("GitHub HTTP %d",res.StatusCode)}
