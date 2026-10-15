@@ -1,0 +1,9 @@
+{
+  "bin_name": "unknown",
+  "running": false,
+  "cpu_percent": null,
+  "ram_used_bytes": null,
+  "ram_total_bytes": null,
+  "uptime_seconds": null,
+  "updated_at": null
+}
