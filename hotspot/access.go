@@ -47,7 +47,7 @@ type cloudflareJWK struct{
  N string `json:"n"`
  E string `json:"e"`
 }
-var teamDomainRE=regexp.MustCompile("^[a-z0-9-]{1,63}\.cloudflareaccess\.com$")
+var teamDomainRE=regexp.MustCompile("^[a-z0-9-]{1,63}\\.cloudflareaccess\\.com$")
 var audienceRE=regexp.MustCompile("^[A-Za-z0-9_-]{32,128}$")
 var jwkCache=struct{
  sync.Mutex
