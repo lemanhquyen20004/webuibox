@@ -6,6 +6,9 @@ package main
 // from the local UI are required before starting an update.
 import (
  "archive/zip"
+ "context"
+ "log"
+ "os/exec"
  "bytes"
  "crypto/sha256"
  "encoding/hex"
@@ -32,7 +35,7 @@ var safeVersion=regexp.MustCompile("^[0-9]+\\.[0-9]+\\.[0-9]+$")
 var safeSha=regexp.MustCompile("^[0-9a-f]{64}$")
 var updateClient=&http.Client{Timeout:90*time.Second}
 var updateFiles=[]string{
- "index.html", "app.js", "styles.css", "hotspot.js", "updater-ui.js", "update.json",
+ "index.html", "app.js", "styles.css", "hotspot.js", "updater-ui.js", "update.json", "box-status.json",
  "bridge/box-status.sh", "scripts/install.sh", "scripts/update.sh",
  "scripts/enable-hotspot.sh", "scripts/disable-hotspot.sh",
  "hotspot/webuibox-hotspot-arm64",
@@ -156,15 +159,46 @@ func installRelease(next string)(string,error){
  if err!=nil{return "",err}
  defer os.RemoveAll(stage)
  if err=unpackRelease(bytes,stage,next);err!=nil{return "",err}
+ // Each release includes a non-device-specific box-status.json placeholder.
+ // Preserve a validated live snapshot during the atomic directory swap.
+ statusPath:=filepath.Join(uiRoot,"box-status.json")
+ if stat,statErr:=os.Lstat(statusPath);statErr==nil && stat.Mode().IsRegular() && stat.Size()<8192{
+  if state,readErr:=os.ReadFile(statusPath);readErr==nil && json.Valid(state){
+   _=os.WriteFile(filepath.Join(stage,"box-status.json"),state,0644)
+  }
+ }
  backup:=filepath.Join(uiParent,fmt.Sprintf("webuibox.backup-%d",time.Now().Unix()))
  if err=os.Rename(uiRoot,backup);err!=nil{return "",err}
  if err=os.Rename(stage,uiRoot);err!=nil{
   if revert:=os.Rename(backup,uiRoot);revert!=nil{return backup,fmt.Errorf("install failed; restore from %s: %w",backup,revert)}
   return "",fmt.Errorf("install failed and old UI restored: %w",err)
  }
- // Update root files only. Do not stop the running daemon; its next reboot
- // will load the new ARM64 binary from the new directory.
+ // Restore the independent Box metadata bridge whenever the UI is upgraded.
+ // Its service.d entry survives reboots; --once regenerates the JSON now.
+ if err:=refreshBoxBridge();err!=nil{
+  log.Printf("WebUiBox: metadata repair warning after upgrade: %v",err)
+ }
+ // Root backend keeps the previously loaded binary until the next reboot.
  return backup,nil
+}
+func refreshBoxBridge()error{
+ script:=filepath.Join(uiRoot,"bridge/box-status.sh")
+ launcher:="#!/system/bin/sh\n/system/bin/sh /data/adb/box/clash/webuibox/bridge/box-status.sh >/dev/null 2>&1 &\n"
+ if err:=os.MkdirAll("/data/adb/service.d",0755);err==nil{
+  if err=os.WriteFile("/data/adb/service.d/webuibox-status.sh",[]byte(launcher),0755);err!=nil{
+   log.Printf("WebUiBox: cannot repair service.d entry: %v",err)
+  }
+ }
+ ctx,cancel:=context.WithTimeout(context.Background(),8*time.Second)
+ defer cancel()
+ out,err:=exec.CommandContext(ctx,"/system/bin/sh",script,"--once").CombinedOutput()
+ if err!=nil{return fmt.Errorf("status regeneration failed: %w (%s)",err,strings.TrimSpace(string(out)))}
+ // A detached script exits immediately when a bridge process is already alive.
+ cmd:=exec.Command("/system/bin/sh",script)
+ cmd.Stdin=nil;cmd.Stdout=io.Discard;cmd.Stderr=io.Discard
+ if err=cmd.Start();err!=nil{return fmt.Errorf("cannot start metadata bridge: %w",err)}
+ _=cmd.Process.Release()
+ return nil
 }
 func (s *Server)updateStage(stage string){
  s.mu.Lock();s.update.Stage=stage;s.mu.Unlock()
@@ -181,6 +215,12 @@ func (s *Server)runUpdate(next string){
 func (s *Server)updaterHandler(w http.ResponseWriter,r *http.Request){
  if !s.auth(w,r){return}
  switch r.URL.Path {
+ case "/api/v1/update/repair-bridge":
+  if r.Method!="POST"{http.Error(w,"method",405);return}
+  if err:=refreshBoxBridge();err!=nil{
+   http.Error(w,"bridge repair failed: "+err.Error(),503);return
+  }
+  jsonResponse(w,map[string]any{"ok":true,"status_file":"/ui/box-status.json","message":"Box metrics refreshed; service.d bridge launcher repaired"})
  case "/api/v1/update/status":
   if r.Method!="GET"{http.Error(w,"method",405);return}
   s.mu.Lock();status:=s.update;s.mu.Unlock()

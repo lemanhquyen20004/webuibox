@@ -1,8 +1,8 @@
-/* WebUiBox v0.0.4 — independently implemented UI using the Mihomo REST/WebSocket API.
+/* WebUiBox v0.0.5 — independently implemented UI using the Mihomo REST/WebSocket API.
    Demo data is clearly labeled; live mode never invents traffic or CPU metrics. */
 (function () {
   "use strict";
-  const VERSION = "0.0.4";
+  const VERSION = "0.0.5";
   const REPO = "https://github.com/lemanhquyen20004/webuibox";
   const MANIFEST = "https://raw.githubusercontent.com/lemanhquyen20004/webuibox/main/update.json";
   const $ = (selector) => document.querySelector(selector);
@@ -27,10 +27,10 @@
   };
 
   Object.assign(tr.vi, {
-    oneClickTitle:"Cập nhật WebUiBox một chạm",oneClickHelp:"Cần WebUiBox Root Backend đã bật và Access Key. Khi nâng cấp từ v0.0.3 phải cài v0.0.4 thủ công một lần và khởi động lại backend.",oneClickConnect:"Kết nối Root Backend",oneClickCheck:"Kiểm tra phiên bản",oneClickInstall:"Cập nhật ngay",hotspot:"Phát Wi-Fi",tools:"Công cụ",about:"Giới thiệu",today:"Hôm nay",device:"Thiết bị",cpuFoot:"CPU toàn máy · cần bridge root",boxStatus:"Trạng thái Box",latency:"Độ trễ",latencyFoot:"Độ trễ node đã chọn",current:"Hiện tại",trafficDistribution:"Phân bố lưu lượng",activeOnly:"Các kết nối hiện tại",activeOnlyShort:"Đang hoạt động",shareNote:"Ước tính theo lưu lượng các kết nối đang hoạt động, không phải cả ngày",toolsDesc:"Công cụ hỗ trợ kiểm tra mạng qua Mihomo API.",dnsTools:"DNS và Cache",dnsToolsHelp:"Các thao tác cache nằm trong Cài đặt và chỉ dùng API Mihomo.",openSettings:"Mở cài đặt",coreTools:"Thông tin core",coreToolsHelp:"Lõi đang chọn trong settings.ini của Box.",aboutDesc:"WebUI Dark Neon cho Box for Root, hỗ trợ Mihomo trên desktop và Android."
+    oneClickTitle:"Cập nhật WebUiBox một chạm",oneClickHelp:"Cần WebUiBox Root Backend đã bật và Access Key. Khi nâng cấp từ v0.0.3 phải cài v0.0.5 thủ công một lần và khởi động lại backend.",oneClickConnect:"Kết nối Root Backend",oneClickCheck:"Kiểm tra phiên bản",oneClickInstall:"Cập nhật ngay",oneClickRepair:"Khôi phục CPU/RAM/Core",hotspot:"Phát Wi-Fi",tools:"Công cụ",about:"Giới thiệu",today:"Hôm nay",device:"Thiết bị",cpuFoot:"CPU toàn máy · cần bridge root",boxStatus:"Trạng thái Box",latency:"Độ trễ",latencyFoot:"Độ trễ node đã chọn",current:"Hiện tại",trafficDistribution:"Phân bố lưu lượng",activeOnly:"Các kết nối hiện tại",activeOnlyShort:"Đang hoạt động",shareNote:"Ước tính theo lưu lượng các kết nối đang hoạt động, không phải cả ngày",toolsDesc:"Công cụ hỗ trợ kiểm tra mạng qua Mihomo API.",dnsTools:"DNS và Cache",dnsToolsHelp:"Các thao tác cache nằm trong Cài đặt và chỉ dùng API Mihomo.",openSettings:"Mở cài đặt",coreTools:"Thông tin core",coreToolsHelp:"Lõi đang chọn trong settings.ini của Box.",aboutDesc:"WebUI Dark Neon cho Box for Root, hỗ trợ Mihomo trên desktop và Android."
   });
   Object.assign(tr.en, {
-    oneClickTitle:"One-tap WebUiBox update",oneClickHelp:"Requires enabled WebUiBox Root Backend and its key. From v0.0.3, install v0.0.4 once manually and restart the backend.",oneClickConnect:"Connect Root Backend",oneClickCheck:"Check releases",oneClickInstall:"Install update",hotspot:"Hotspot",tools:"Tools",about:"About",today:"Today",device:"Device",cpuFoot:"Phone CPU · root bridge needed",boxStatus:"Box status",latency:"Latency",latencyFoot:"Selected node latency",current:"Selected",trafficDistribution:"Traffic distribution",activeOnly:"Current connections",activeOnlyShort:"Active",shareNote:"Estimated from active connection bytes, not daily totals",toolsDesc:"Networking tools through the Mihomo API.",dnsTools:"DNS and Cache",dnsToolsHelp:"Cache maintenance is available in Settings through Mihomo API.",openSettings:"Open Settings",coreTools:"Core information",coreToolsHelp:"Core selected in Box settings.ini.",aboutDesc:"Dark Neon WebUI for Box for Root with Mihomo support on desktop and Android."
+    oneClickTitle:"One-tap WebUiBox update",oneClickHelp:"Requires enabled WebUiBox Root Backend and its key. From v0.0.3, install v0.0.5 once manually and restart the backend.",oneClickConnect:"Connect Root Backend",oneClickCheck:"Check releases",oneClickInstall:"Install update",oneClickRepair:"Repair CPU/RAM/Core",hotspot:"Hotspot",tools:"Tools",about:"About",today:"Today",device:"Device",cpuFoot:"Phone CPU · root bridge needed",boxStatus:"Box status",latency:"Latency",latencyFoot:"Selected node latency",current:"Selected",trafficDistribution:"Traffic distribution",activeOnly:"Current connections",activeOnlyShort:"Active",shareNote:"Estimated from active connection bytes, not daily totals",toolsDesc:"Networking tools through the Mihomo API.",dnsTools:"DNS and Cache",dnsToolsHelp:"Cache maintenance is available in Settings through Mihomo API.",openSettings:"Open Settings",coreTools:"Core information",coreToolsHelp:"Core selected in Box settings.ini.",aboutDesc:"Dark Neon WebUI for Box for Root with Mihomo support on desktop and Android."
   });
   let lang = localStorage.getItem("webuibox.lang") === "en" ? "en" : "vi";
   let demo = localStorage.getItem("webuibox.demo") === "true";
@@ -223,7 +223,7 @@
     ];
     rules=[{type:"DOMAIN-SUFFIX",payload:"google.com",proxy:"PROXY"},{type:"DOMAIN-KEYWORD",payload:"game",proxy:"PROXY"},{type:"GEOIP",payload:"VN",proxy:"DIRECT"},{type:"MATCH",payload:"",proxy:"PROXY"}];
     config={mode:"rule"};logs=[];
-    pushLog({type:"info",payload:"WebUiBox v0.0.4 · DEMO MODE"});
+    pushLog({type:"info",payload:"WebUiBox v0.0.5 · DEMO MODE"});
     pushLog({type:"info",payload:"Sample Mihomo metrics — no live data"});
     bridgeBin="mihomo";$("#core-name").textContent="mihomo";$("#core-version").textContent="v1.19.31 (demo)";
     $("#core-source").textContent="DEMO / bin_name";$("#settings-bin").textContent="mihomo (demo)";
@@ -259,17 +259,24 @@
     try{
       // The root bridge emits a read-only JSON file inside Mihomo SAFE_PATHS.
       // fetch uses the page origin, so the controller's secret is not exposed to a third-party host.
-      const response=await fetch(new URL("./box-status.json",location.href),{cache:"no-store"});
-      if(!response.ok)throw Error("missing");
+      const snapshotUrl=new URL("./box-status.json",location.href);
+      snapshotUrl.searchParams.set("t",Date.now().toString());
+      const response=await fetch(snapshotUrl,{cache:"no-store"});
+      if(!response.ok)throw Error("HTTP "+response.status+" (/ui/box-status.json)");
       const data=await response.json();
       const core=typeof data.bin_name==="string"?data.bin_name.trim():"";
+      if(core==="unknown")throw Error(lang==="vi"?"Chưa có dữ liệu từ script root":"Waiting for root status writer");
       if(!/^(?:clash|mihomo|sing-box|xray|v2fly|hysteria|hysteria2)$/.test(core))throw Error("unknown bin");
       bridgeBin=core;
       $("#core-name").textContent=core;
       $("#settings-bin").textContent=core;
       $("#tools-core").textContent=core;
       $("#core-source").textContent="settings.ini → bin_name";
-      $("#core-warning").textContent=t("bridgeReady") + " · " + (data.running ? t("running") : t("offline"));
+      const lastUpdated=Date.parse(data.updated_at||"");
+      const stale=Number.isFinite(lastUpdated)&&Date.now()-lastUpdated>60000;
+      $("#core-warning").textContent=(stale
+        ? (lang==="vi"?"Bridge chưa cập nhật trong 60 giây":"Bridge status older than 60 seconds")
+        : t("bridgeReady"))+" · "+(data.running?t("running"):t("offline"));
       const cpu=Number(data.cpu_percent);
       if (data.cpu_percent!=null && Number.isFinite(cpu) && cpu>=0 && cpu<=100){
         $("#cpu-usage").textContent=cpu.toFixed(0)+"%";
@@ -292,7 +299,15 @@
       $("#settings-bin").textContent="—";$("#tools-core").textContent="—";
       $("#core-name").textContent=t("unknown");
       $("#core-source").textContent="settings.ini → bin_name";
-      $("#core-warning").textContent=t("noBridge");
+      const onLocal=["127.0.0.1","localhost"].includes(location.hostname);
+      const detail=String(e&&e.message||"unknown error").slice(0,100);
+      $("#core-warning").textContent=lang==="vi"
+        ? "Không đọc được Box Bridge ("+detail+"). "+(onLocal
+          ? "Kiểm tra /ui/box-status.json và service.d/webuibox-status.sh."
+          : "Bạn đang mở qua tên miền; thử http://127.0.0.1:9090/ui/ trên điện thoại gốc.")
+        : "Box Bridge inaccessible ("+detail+"). "+(onLocal
+          ? "Check /ui/box-status.json and the service.d bridge."
+          : "You're using a domain; try http://127.0.0.1:9090/ui/ on the rooted phone.");
       $("#cpu-usage").textContent="—";$("#system-memory").textContent="—";
       $("#system-memory-detail").textContent="—";
       $("#cpu-progress").style.width="0%";$("#system-memory-progress").style.width="0%";

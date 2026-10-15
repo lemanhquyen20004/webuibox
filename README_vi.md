@@ -94,3 +94,12 @@ WebUiBox nay có nút **Cập nhật ngay** trong trang Cập nhật: khi phát 
 4. Từ các bản sau (v0.0.5 trở lên), khi mục Cập nhật phát hiện phiên bản mới thì nhấn **Cập nhật ngay**, xác nhận. Chờ xác minh, sao lưu và cài; WebUI sẽ tải lại sau khi hoàn tất. Nếu binary backend thay đổi, reboot để nạp binary mới.
 
 **An toàn:** API cập nhật root buộc có key bí mật, chấp nhận Origin localhost của Mihomo, và chỉ cho tải repo cố định. Đây là kiểm tra checksum từ cùng chủ sở hữu repo, **không phải chữ ký độc lập**, vì vậy cần bảo vệ tài khoản GitHub. Bản cũ được lưu theo thư mục /data/adb/box/clash/webuibox.backup-<timestamp> để khôi phục thủ công nếu cần. Không đưa cổng 9097 lên Cloudflare hoặc LAN. Kiểm thử CI không thay thế thử nghiệm thực tế trên Redmi Note 8T.
+
+
+## v0.0.5 — Sửa lỗi mất CPU / RAM / Core sau khi cập nhật
+
+Mỗi Release giờ đóng gói kèm file **box-status.json khởi tạo**, giá trị ban đầu là `unknown`/`null`, KHÔNG phải dữ liệu thật của máy. Khi cài/cập nhật, WebUiBox **giữ bản box-status.json thực đang có** và chạy `bridge/box-status.sh` để tự tạo dữ liệu theo điện thoại. File service khởi động lại cùng máy ở `/data/adb/service.d/webuibox-status.sh` cũng được tạo/sửa khi cài từ script.
+
+Nếu chỉ dùng MT Manager để **chép đè riêng file HTML/JS** thì script root chưa chắc đã chạy. Muốn CPU/RAM/Core thật hoạt động, vẫn phải bật bridge root tối thiểu một lần. Bản cập nhật sau sẽ không yêu cầu thêm thủ công file JSON nữa khi backend và service đang hoạt động.
+
+**Không upload JSON thật của điện thoại lên GitHub** vì đó là dữ liệu riêng và sẽ không tự thay đổi nếu chỉ lưu trên repo. Khi sử dụng tên miền thay cho `127.0.0.1:9090/ui/`, cần đảm bảo đường dẫn `/ui/box-status.json` được phục vụ đúng; không công khai những dữ liệu thiết bị không cần thiết.

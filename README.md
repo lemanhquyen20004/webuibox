@@ -87,3 +87,10 @@ The Updates page includes **Install update**. After the user connects the authen
 4. Once a later version (v0.0.5+) is published, use Install update and confirm; the UI reloads after the verified update. Reboot if you need to activate a newer root backend binary.
 
 **Security/limitations:** A SHA-256 published by the same GitHub account ensures asset integrity but is not an independent cryptographic signature. Keep your repository credentials safe, don't expose port 9097 on the LAN/Internet, and never share the root API key. The previous UI is retained in /data/adb/box/clash/webuibox.backup-<timestamp>. GitHub Actions tests do not validate behavior on every MIUI build.
+
+
+## v0.0.5 — Persistent status across WebUI upgrades
+
+Every release now ships a neutral `box-status.json` (unknown/null placeholders, **no private device data**). The installer and root updater preserve an existing live status snapshot, refresh it from the rooted device, and arrange for the Box status writer to run at boot. Real CPU, RAM, device uptime and selected Box binary are sourced only from the device and refreshed by `bridge/box-status.sh`.
+
+A manual ZIP copy of HTML/JS alone does not activate the root bridge; enable it once with root and keep `service.d/webuibox-status.sh` enabled. Updates do not require manually recreating the JSON thereafter. If hosting the UI via a different domain, ensure the `/ui/box-status.json` path resolves to the phone's instance. Avoid publishing local device data publicly.
