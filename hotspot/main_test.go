@@ -14,13 +14,13 @@ func TestInterface(t *testing.T){
 }
 func TestLocalPreflightAndKey(t *testing.T){
  server:=&Server{token:"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}
- req:=httptest.NewRequest("OPTIONS","http://127.0.0.1:9097/api/v1/status",nil)
+ req:=httptest.NewRequest("OPTIONS","http://127.0.0.1:9098/api/v1/status",nil)
  req.Header.Set("Origin","http://127.0.0.1:9090")
  rec:=httptest.NewRecorder()
  server.auth(rec,req)
  if rec.Code!=204{t.Fatalf("local OPTIONS got %d, want 204",rec.Code)}
  if rec.Header().Get("Access-Control-Allow-Origin")=="*"{t.Fatal("wildcard CORS")}
- req2:=httptest.NewRequest("GET","http://127.0.0.1:9097/api/v1/status",nil)
+ req2:=httptest.NewRequest("GET","http://127.0.0.1:9098/api/v1/status",nil)
  req2.Header.Set("Origin","http://127.0.0.1:9090")
  req2.Header.Set("X-WebUiBox-Key","incorrect")
  rec2:=httptest.NewRecorder()
