@@ -26,6 +26,9 @@ func TestLocalOriginHost(t *testing.T){
  if isLocalRequest(r){t.Fatal("cross origin accepted")}
  r.Header.Set("Origin",ownerOrigin)
  if isLocalRequest(r){t.Fatal("remote origin accepted locally")}
+ r.Header.Del("Origin")
+ r.Header.Set("Cf-Connecting-Ip","198.51.100.13")
+ if isLocalRequest(r){t.Fatal("proxied localhost Host bypassed Access JWT")}
 }
 func TestAccessAudience(t *testing.T){
  arr,_:=json.Marshal([]string{"first","correct-aud"})
